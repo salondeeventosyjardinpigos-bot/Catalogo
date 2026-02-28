@@ -1,0 +1,460 @@
+/* =====================
+   PIGO'S – Flipbook CSS
+   ===================== */
+:root{
+  --brand-blue:#1F4E79;
+  --brand-gold:#C39A36;
+  --ink:#0e2747;
+  --paper:#ffffff;
+}
+*{ box-sizing:border-box }
+
+html,body{
+  height:100%; margin:0; background:var(--ink);
+  font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+}
+
+/* Flipbook más ALTO (llena casi toda la pantalla) */
+.flipbook-root{
+  width: min(1100px, 96vw);
+  height: calc(100vh - 80px);   /* ← ANTES era una altura fija */
+  margin: 40px auto;            /* centrado con aire */
+  background:#111;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 25px 60px rgba(0,0,0,.35);
+}
+/* Página */
+.page{
+  position:relative; width:100%; height:100%;
+  background:var(--paper); padding:20px 28px 28px;
+}
+
+/* Títulos base */
+.h1{font-size:44px;font-weight:900;color:var(--brand-blue);letter-spacing:.02em;margin:0 0 8px}
+.h2{font-size:30px;font-weight:800;color:var(--brand-blue);margin:0 0 12px}
+.h3{font-size:20px;font-weight:700;color:#333;margin:0 0 8px}
+
+/* Portada */
+.cover-custom{ width:100%; height:100%; display:flex; position:relative; background:#fff; overflow:hidden; }
+.cover-custom .left-side{ width:48%; height:100%; position:relative; background:#fff; }
+.cover-custom .left-side .marble{
+  position:absolute; inset:0;
+  background:url('assets/logo_pigos.jpg') center/cover no-repeat;
+  opacity:.9; clip-path: ellipse(130% 50% at -15% 50%);
+}
+.cover-custom .right-side{ width:70%; padding:40px 10px 40px 20px; display:flex; flex-direction:column; justify-content:center; }
+.title-cover{ font-size:52px; font-weight:900; color:#000; line-height:1.05; margin:0 0 20px; }
+.author{ font-size:22px; font-weight:600; margin-bottom:8px; }
+.phone{ font-size:20px; font-weight:700; color:#444; }
+
+/* Índice */
+.index{ padding:0; }
+.index .bg{
+  position:absolute; inset:0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.25)),
+    url('assets/indice_bg.jpg') center/cover no-repeat;
+}
+.index .wrap{ position:relative; z-index:1; height:100%; display:flex; flex-direction:column; padding:28px; }
+.index .title{
+  font-weight:900; letter-spacing:.06em; text-align:center;
+  margin:0 0 12px; font-size:44px; color:#fff; text-shadow:0 2px 18px rgba(0,0,0,.4);
+}
+.index .cols{ display:grid; grid-template-columns:1fr 1fr; gap:12px 26px; overflow:auto; padding:8px; }
+.index .row{
+  display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px;
+  color:#fff; font-weight:800; font-size:21px; cursor:pointer;
+}
+.index .row:hover{ background:rgba(255,255,255,.12); }
+/* bullets grandes */
+.index .row img{ width:32px; height:32px; object-fit:contain; filter:none; background:transparent; }
+
+/* Topbar sólo en Índice (centrada) */
+.index .topbar--index{
+  position:absolute; left:50%; top:8px; transform:translateX(-50%);
+  display:flex; justify-content:center; align-items:center; gap:10px;
+  z-index:20000; pointer-events:auto;
+  padding:8px 12px; background:rgba(255,255,255,.92);
+  border:1px solid rgba(0,0,0,.08); border-radius:12px;
+  backdrop-filter: blur(4px);
+  box-shadow:0 6px 16px rgba(0,0,0,.12);
+}
+.index .topbar--index .btn{
+  display:inline-flex; align-items:center; gap:6px;
+  background:#f6f7f9; border:1px solid #d8dbe2; color:#203040;
+  padding:6px 12px; border-radius:10px; font-weight:700; text-decoration:none;
+  white-space:nowrap; box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.index .topbar--index .btn:hover{ background:#eef1f5; }
+
+/* Título premium + logo a la izquierda */
+.title-bar{ display:flex; justify-content:center; align-items:center; margin-top:12px; margin-bottom:10px; }
+.h2.title-with-logo{
+  display:inline-flex; align-items:baseline; gap:10px; margin:0;
+  font-weight:900; font-size:40px; letter-spacing:.5px; color:var(--brand-blue);
+  text-shadow:0 3px 8px rgba(0,0,0,.30);
+  position:relative; padding-bottom:10px; text-align:left;
+}
+.title-logo{
+  width:68px; height:68px; border-radius:50%; object-fit:cover;
+  flex:0 0 auto; filter:drop-shadow(0 2px 4px rgba(0,0,0,.18));
+}
+.title-text{ position:relative; display:inline-block; }
+.title-text::after{
+  content:""; position:absolute; left:50%; transform:translateX(-50%); bottom:-10px;
+  width:120px; height:4px; background:var(--brand-gold); border-radius:4px;
+}
+
+/* FAB Home (centrado abajo) — forzado */
+.fab-home{
+  position:absolute !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:14px !important;
+  transform:translateX(-50%) !important;
+  display:inline-flex !important; align-items:center !important; justify-content:center !important;
+  width:44px !important; height:44px !important; border-radius:50% !important;
+  color:#1F4E79 !important; background:#fff !important; border:1px solid rgba(0,0,0,.1) !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.16) !important; z-index:30000 !important;
+  pointer-events:auto !important; cursor:pointer !important; text-decoration:none !important;
+}
+.fab-home:hover{ color:#0e2747 !important; background:#f7f9fb !important; }
+
+
+/* Rejillas base */
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.grid-7{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.grid-7 .span-2{ grid-column:span 2; }
+.img-card{ position:relative; background:#fafafa; border:1px solid #eee; border-radius:10px; overflow:hidden; }
+.img-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+/* Layout 1–3–2 */
+.layout-132{
+  display:grid;
+  grid-template-columns: 2fr 1.2fr 1.2fr;
+  grid-template-rows: repeat(6, 1fr);
+  grid-template-areas:
+    "A B1 C1"
+    "A B1 C1"
+    "A B2 C1"
+    "A B2 C1"
+    "A B3 C2"
+    "A B3 C2";
+  gap:18px;
+}
+.layout-132 .img-card{ border:none; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.layout-132 .img-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+.layout-132 .img-card:nth-child(1){ grid-area:A; }
+.layout-132 .img-card:nth-child(2){ grid-area:B1; }
+.layout-132 .img-card:nth-child(3){ grid-area:B2; }
+.layout-132 .img-card:nth-child(4){ grid-area>B3; } /* (no se usa > aquí, es regla por posición) */
+.layout-132 .img-card:nth-child(4){ grid-area:B3; } /* corrección explícita */
+.layout-132 .img-card:nth-child(5){ grid-area:C1; }
+.layout-132 .img-card:nth-child(6){ grid-area:C2; }
+.layout-132 > .img-card:nth-child(n+7){ grid-column:1 / -1; height:240px; }
+
+/* Fallback para < 6 fotos */
+.layout-auto{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:16px;
+}
+.layout-auto .img-card{ border:none; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.08); height:230px; }
+.layout-auto .img-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+/* Lightbox */
+.lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:9999; }
+.lightbox.open{ display:flex; }
+.lightbox img{ max-width:92vw; max-height:92vh; border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+.lightbox .nav{
+  position:absolute; top:50%; transform:translateY(-50%); font-size:34px; color:#fff;
+  background:rgba(0,0,0,.35); width:46px; height:46px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none;
+}
+.lightbox .prev{ left:16px; }
+.lightbox .next{ right:16px; }
+.lightbox .close{ position:absolute; top:14px; right:14px; width:42px; height:42px; font-size:20px; }
+
+/* Contacto */
+.contact{ display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:center; }
+.contact .qr{ display:flex; align-items:center; justify-content:center; }
+.contact .qr img{ max-width:280px; width:80%; }
+.contact .links{ display:grid; gap:10px; }
+.contact .social{ display:flex; gap:12px; align-items:center; }
+.contact .social img{ width:34px; height:34px; object-fit:contain; }
+.contact .social a{ color:var(--brand-blue); font-weight:800; text-decoration:none; }
+
+/* Responsive */
+@media (max-width:900px){
+  .flipbook-root{ width:min(96vw,900px); height:min(88vh,720px); }
+  .index .cols{ grid-template-columns:1fr; }
+  .grid-3{ grid-template-columns:repeat(2,1fr); }
+  .layout-132{ grid-template-columns:1.6fr 1fr 1fr; gap:14px; }
+  .layout-auto{ grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); }
+  .layout-auto .img-card{ height:190px; }
+}
+@media (max-width:520px){
+  .flipbook-root{ width:96vw; height:76vh; }
+  .grid-3{ grid-template-columns:1fr; }
+  .title-bar{ margin-top:14px; }
+  .h2.title-with-logo{ font-size:34px; gap:10px; }
+  .title-logo{ width:64px; height:64px; }
+  .title-text::after{ width:100px; height:3px; bottom:-10px; }
+  .layout-132{ grid-template-columns:1fr; grid-template-rows:none; grid-template-areas:none; }
+  .layout-132 .img-card{ grid-area:auto !important; height:auto; }
+  .layout-132 .img-card img{ height:auto; }
+  .layout-auto{ grid-template-columns:1fr; }
+  .layout-auto .img-card{ height:220px; }
+  .index .topbar--index{ flex-wrap:wrap; row-gap:8px; }
+  .fab-home{ bottom:18px !important; }
+}
+
+
+
+
+/************  CAT PAGE: alto completo y layouts por COLUMNAS  ************/
+:root{ --page-bottom-safe: 68px; }      /* aire para FAB/bullet inferior */
+
+/* Wrapper vertical en páginas de categoría */
+.cat-page{
+  display: grid;
+  grid-template-rows: auto 1fr;         /* 1) título  2) grid que LLENA */
+  row-gap: 12px;
+  height: 100%;                         /* ← llena la hoja del flipbook */
+  min-height: 0;
+  padding-bottom: var(--page-bottom-safe);
+}
+
+/* El grid (hijo directo después del título) hereda columna‑primero */
+.cat-page > [class^="layout-"],
+.cat-page > [class*=" layout-"]{
+  min-height: 0;
+}
+
+/* Tarjeta base (común) */
+[class^="layout-"] .img-card{
+  height: 100%; min-height: 0;
+  border: none; border-radius: 14px; overflow: hidden;
+  box-shadow: 0 8px 22px rgba(0,0,0,.10);
+}
+[class^="layout-"] .img-card img{
+  width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block;
+}
+
+/* ============== 1) 1 FOTO (HERO) – 1 COLUMNA ============== */
+.layout-1-hero{
+  display: grid;
+  grid-template-columns: 1fr;           /* una sola columna */
+  grid-template-rows: 1fr;              /* ocupa toda la altura disponible */
+  gap: 0;
+}
+
+/* ============== 2) 2 FOTOS – 2 COLUMNAS 50/50 ============== */
+.layout-2-split{
+  display: grid;
+  grid-template-columns: 1fr 1fr;       /* COLUMNA–primero */
+  grid-auto-rows: 1fr;                  /* ambas columnas llenan a lo alto */
+  gap: 16px;
+}
+.layout-2-split .img-card{ height: auto; } /* deja que la grid mande */
+
+/* ===== 3) 3 FOTOS – IZQ GRANDE + DER 2 APILADAS (COLUMNA-primero) ===== */
+.layout-3-split{
+  display: grid;
+  grid-template-columns: 2fr 1fr;       /* columna izquierda dominante */
+  grid-template-rows: minmax(0,1fr) minmax(0,1fr);  /* 2 filas que llenan */
+  gap: 16px; align-items: stretch;
+}
+/* 1: IZQ grande ocupa las 2 filas (vertical) */
+.layout-3-split .img-card:nth-child(1){ grid-column: 1; grid-row: 1 / span 2; }
+/* 2 y 3: DER apiladas */
+.layout-3-split .img-card:nth-child(2){ grid-column: 2; grid-row: 1; }
+.layout-3-split .img-card:nth-child(3){ grid-column: 2; grid-row: 2; }
+
+/* ============== 4) 4 FOTOS – 2 COLUMNAS × 2 FILAS ============== */
+.layout-4-2x2{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0,1fr) minmax(0,1fr);
+  gap: 16px;
+}
+
+/* == 5–6 FOTOS – HERO ARRIBA, LUEGO 3, LUEGO 2 GRANDES (llena hoja) == */
+.layout-6-hero-3-2{
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);      /* columnas vertical-friendly */
+  grid-template-rows: minmax(0,1.8fr) minmax(0,1fr) minmax(0,1.2fr);
+  gap: 16px;
+}
+/* 1: hero a lo ancho */
+.layout-6-hero-3-2 .img-card:nth-child(1){ grid-column: 1 / -1; grid-row: 1; }
+/* 2–4: tres en la “segunda capa” (dos columnas por tarjeta) */
+.layout-6-hero-3-2 .img-card:nth-child(2){ grid-column: 1 / span 2; grid-row: 2; }
+.layout-6-hero-3-2 .img-card:nth-child(3){ grid-column: 3 / span 2; grid-row: 2; }
+.layout-6-hero-3-2 .img-card:nth-child(4){ grid-column: 5 / span 2; grid-row: 2; }
+/* 5–6: dos grandes abajo (3 columnas cada una) */
+.layout-6-hero-3-2 .img-card:nth-child(5){ grid-column: 1 / span 3; grid-row: 3; }
+.layout-6-hero-3-2 .img-card:nth-child(6){ grid-column: 4 / span 3; grid-row: 3; }
+
+/************  RESPONSIVO  ************/
+@media (max-width: 1000px){
+  .layout-3-split{ grid-template-columns: 1.6fr 1fr; gap: 14px; }
+  .layout-6-hero-3-2{ gap: 14px; }
+}
+@media (max-width: 620px){
+  /* En móvil apilamos (1 columna) con relaciones cómodas */
+  .layout-1-hero .img-card,
+  .layout-2-split .img-card,
+  .layout-3-split .img-card,
+  .layout-4-2x2 .img-card,
+  .layout-6-hero-3-2 .img-card{ height:auto; aspect-ratio: 4 / 3; }
+
+  .layout-2-split{ grid-template-columns: 1fr; grid-auto-rows: auto; }
+  .layout-3-split{ grid-template-columns: 1fr; grid-template-rows: none; }
+  .layout-4-2x2{ grid-template-columns: 1fr; grid-template-rows: none; }
+
+  .layout-6-hero-3-2{ grid-template-columns: 1fr; grid-template-rows: none; }
+  .layout-3-split .img-card:nth-child(n),
+  .layout-6-hero-3-2 .img-card:nth-child(n){ grid-column: 1; grid-row: auto; }
+}
+
+/* FAB Home – dibuja la casita aunque no exista <svg> interno */
+.fab-home{
+  position:absolute !important;
+  left:50% !important; bottom:18px !important; transform:translateX(-50%) !important;
+  display:flex !important; align-items:center !important; justify-content:center !important;
+  width:46px !important; height:46px !important; border-radius:50% !important;
+  background:#fff !important;
+  border:1px solid rgba(0,0,0,.12) !important;
+  box-shadow:0 6px 16px rgba(0,0,0,.20) !important;
+  color:#1F4E79 !important;                         /* color del ícono si usas máscara */
+  z-index:200000 !important;
+  text-decoration:none !important;
+}
+
+/* Dibuja la casita con un SVG embebido como background */
+.fab-home::before{
+  content:"";
+  display:block;
+  width:24px; height:24px;
+  background: no-repeat center / contain;
+  /* Ícono en SVG embebido (color negro) */
+  background-image: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+    <path fill='%230e2747' d='M10.707 2.293a1 1 0 0 1 1.414 0l9 9a1 1 0 1 1-1.414 1.414L20 12.414V20a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5H11v5a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2v-7.586l-.707.707A1 1 0 0 1 1.879 11.293l9-9Z'/>\
+  </svg>");
+}
+
+/* Hover sutil */
+.fab-home:hover{ background:#f7f9fb !important; }
+
+/* ===== INDEX: que se vea completo y con scroll interno ===== */
+.index{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+}
+.index .bg{
+  position: absolute; inset: 0;
+  z-index: 0;                            /* fondo atrás */
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.25)),
+    url('assets/indice_bg.jpg') center/cover no-repeat;
+}
+.index .wrap{
+  position: relative; z-index: 1;         /* contenido arriba del fondo */
+  height: 100%;
+  display: flex; flex-direction: column;
+  padding: 28px 24px;
+}
+.index .title{
+  margin: 0 0 12px;
+  text-align: center;
+  color: #fff;
+  font-weight: 900;
+  font-size: 44px;
+  letter-spacing: .06em;
+  text-shadow: 0 2px 18px rgba(0,0,0,.4);
+}
+
+/* Área scrolleable del listado */
+.index .cols{
+  flex: 1 1 auto;                         /* << ocupa todo el alto restante */
+  overflow: auto;                         /* << scroll interno si no cabe */
+  display: grid;
+  grid-template-columns: 1fr 1fr;         /* dos columnas */
+  gap: 12px 26px;
+  padding: 6px 6px 2px 2px;               /* un poquito de respiro */
+}
+.index .row{
+  display: flex; align-items: center; gap: 10px;
+  color: #fff; font-weight: 800; font-size: 20px;
+  cursor: pointer; user-select: none;
+  padding: 8px 10px; border-radius: 10px;
+}
+.index .row img{
+  width: 20px; height: 20px; object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));
+}
+.index .row:hover{ background: rgba(255,255,255,.10); }
+
+@media (max-width: 900px){
+  .index .cols{ grid-template-columns: 1fr; }
+}
+
+/* ===== Ubicación: logo de fondo + QR centrado abajo + iconos grandes ===== */
+.contact-ubicacion{
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  height: 100%;
+  padding: 12px 24px 84px;     /* aire para FAB bottom */
+  gap: 12px;
+}
+
+/* Marca de agua del logo */
+.contact-ubicacion::before{
+  content:"";
+  position:absolute; inset:0;
+  background: url('assets/logo_circle.png') center/200% no-repeat; /* ajusta 45% a tu gusto */
+  opacity: .20; pointer-events: none;
+}
+
+/* Título por delante del fondo */
+.contact-ubicacion .h2{ position:relative; z-index:1; margin: 6px 0 4px; }
+
+/* Bloque QR: lo empujamos hacia abajo y centrado */
+.contact-ubicacion .qr-block{
+  position:relative; z-index:1;
+  margin-top: auto;                 /* ← baja el QR hacia la parte inferior */
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+}
+.contact-ubicacion .qr-block a{ display:inline-block; }
+.contact-ubicacion .qr-block img{
+  width: 260px; max-width: 72vw; height:auto;
+  border-radius: 12px; box-shadow: 0 8px 22px rgba(0,0,0,.18);
+}
+.contact-ubicacion .qr-note{
+  margin:0; color:#203040; font-weight:700; opacity:.9;
+}
+
+/* Links sociales: íconos grandes y clicables */
+.contact-ubicacion .links{
+  position:relative; z-index:1;
+  width: 100%; max-width: 560px;
+  display:grid; gap: 12px;
+}
+.contact-ubicacion .social{
+  display:flex; align-items:center; gap:14px;
+  text-decoration:none; color:#1F4E79; font-weight:800;
+  padding: 6px 8px; border-radius: 10px;
+}
+.contact-ubicacion .social:hover{ background: rgba(31,78,121,.08); }
+.contact-ubicacion .social img{
+  width: 52px; height: 52px; object-fit:contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.12));
+}
+
+@media (max-width: 520px){
+  .contact-ubicacion .qr-block img{ width: 220px; }
+  .contact-ubicacion .social img{ width: 46px; height: 46px; }
+}
