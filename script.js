@@ -293,6 +293,47 @@ const pageFlip=new St.PageFlip(root,{
 });
 pageFlip.loadFromHTML(domPages);
 
+
+/* ===== Auto-fit del flipbook según viewport ===== */
+(function autoFitFlipbook(){
+  const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1)); // útil si usas retina
+  const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+
+  function fit(){
+    const vw = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    const vh = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+
+    // Modo “móvil angosto”: usar ancho reducido y alto casi completo
+    if (vw <= 700){
+      const targetW = Math.min(420, vw - 16);             // 420px o 96% del ancho
+      const targetH = Math.floor(clamp(vh - 32, 520, 900)); // alto visible menos márgenes
+
+      root.style.width  = targetW + 'px';
+      root.style.height = targetH + 'px';
+    }else{
+      // Desktop/tablet: mitad del ancho del libro por página, alto ajustado al viewport
+      const targetW = Math.min(1200, Math.floor(vw * 0.96));
+      const targetH = Math.floor(vh - 32);
+      root.style.width  = targetW + 'px';
+      root.style.height = targetH + 'px';
+    }
+
+    // Refrescar PageFlip tras aplicar CSS
+    requestAnimationFrame(()=> pageFlip.update());
+  }
+
+  // Llamada inicial y en cambios de tamaño/orientación
+  let tid;
+  const onResize = ()=>{ clearTimeout(tid); tid = setTimeout(fit, 50); };
+  window.addEventListener('resize', onResize, {passive:true});
+  window.addEventListener('orientationchange', onResize, {passive:true});
+
+  // iOS “100vh” quirks: forzar recálculo al terminar la animación de barras
+  window.addEventListener('visibilitychange', onResize);
+
+  fit();
+})();
+
 /* ===========================
    NUMERACIÓN
 =========================== */

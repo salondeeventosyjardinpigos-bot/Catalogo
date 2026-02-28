@@ -14,22 +14,88 @@ html,body{
   font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
 }
 
-/* Flipbook más ALTO (llena casi toda la pantalla) */
+/* ===== Flipbook responsivo (usa alto real del viewport) ===== */
 .flipbook-root{
-  width: min(1100px, 96vw);
-  height: calc(100vh - 80px);   /* ← ANTES era una altura fija */
-  margin: 40px auto;            /* centrado con aire */
+  /* ancho: fluido entre 320px y 1200px */
+  width: min(1200px, 96vw);
+  /* alto: usa svh/dvh si están disponibles; fallback 100vh */
+  height: calc(100svh - 32px);
+  height: calc(100dvh - 32px);
+  height: calc(100vh - 32px);
+  margin: 16px auto;
   background:#111;
   border-radius:12px;
   overflow:hidden;
   box-shadow:0 25px 60px rgba(0,0,0,.35);
 }
-/* Página */
+
+/* Ajustes de página: un poco menos de padding en móvil */
 .page{
   position:relative; width:100%; height:100%;
-  background:var(--paper); padding:20px 28px 28px;
+  background:#fff; padding:20px 28px 28px;
+}
+@media (max-width: 700px){
+  .page{ padding:14px 16px 20px; }
 }
 
+/* ===== Índice: tipografía y scroll interno más discreto ===== */
+.index .title{
+  margin:0 0 10px; text-align:center; color:#fff;
+  font-weight:900; font-size:clamp(26px, 5vw, 44px);
+  letter-spacing:.06em; text-shadow:0 2px 18px rgba(0,0,0,.4);
+}
+.index .wrap{ padding: clamp(16px, 3.2vw, 28px); }
+.index .cols{
+  flex:1 1 auto; overflow:auto; /* scroll interno si hace falta */
+  display:grid; grid-template-columns: 1fr 1fr; gap: 12px 22px;
+  padding: 6px;
+}
+/* En móviles: 1 columna y elementos más cómodos */
+@media (max-width: 900px){
+  .index .cols{ grid-template-columns: 1fr; }
+  .index .row{ font-size: clamp(16px, 3.8vw, 20px); }
+}
+/* Estética del scrollbar (discreto) */
+.index .cols::-webkit-scrollbar{ width:8px; }
+.index .cols::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.25); border-radius:6px; }
+
+/* ===== Títulos de categorías: escala con la pantalla ===== */
+.h2.title-with-logo{
+  font-size: clamp(22px, 4.6vw, 40px);
+  gap: clamp(6px, 1.4vw, 10px);
+}
+.title-logo{
+  width: clamp(42px, 9vw, 68px);
+  height: clamp(42px, 9vw, 68px);
+}
+
+/* ===== “Ubicación & Contacto”: respira mejor en móvil ===== */
+.contact-ubicacion{ padding: 8px clamp(12px, 4vw, 24px) 84px; }
+.contact-ubicacion .qr-block img{
+  width: clamp(200px, 60vw, 260px);
+}
+.contact-ubicacion .social img{
+  width: clamp(40px, 8vw, 52px);
+  height: clamp(40px, 8vw, 52px);
+}
+
+/* ===== FAB Home: no tape contenido y quede centrado siempre ===== */
+#book .page .fab-home{
+  bottom: clamp(12px, 3.2vw, 18px);
+}
+
+/* Pequeños ajustes de grillas (evitar cortes en móviles) */
+@media (max-width: 620px){
+  .layout-2-split,
+  .layout-3-split,
+  .layout-4-2x2,
+  .layout-6-hero-3-2{
+    grid-template-columns:1fr !important;
+    grid-template-rows:none !important;
+    gap: clamp(8px, 2.8vw, 16px);
+  }
+  [class^="layout-"] .img-card{ height:auto; aspect-ratio: 4/3; }
+}
 /* Títulos base */
 .h1{font-size:44px;font-weight:900;color:var(--brand-blue);letter-spacing:.02em;margin:0 0 8px}
 .h2{font-size:30px;font-weight:800;color:var(--brand-blue);margin:0 0 12px}
