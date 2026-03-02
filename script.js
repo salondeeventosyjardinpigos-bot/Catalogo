@@ -276,48 +276,23 @@ for (const k of CATEGORIES){
   pages.push(p);
 }
 /* ===========================
-   INIT FLIPBOOK (stretch)
+   INIT FLIPBOOK
 =========================== */
-pages.forEach(pg => book.appendChild(pg));
+pages.forEach(pg=>book.appendChild(pg));
+
+// Mismo NodeList que verá PageFlip
 const domPages = Array.from(book.querySelectorAll('.page'));
 
-const pageFlip = new St.PageFlip(root, {
-  // Estos tamaños sirven como PROPORCIÓN; el escalado real lo dicta el contenedor (size:'stretch')
-  width: 850,
-  height: 1100,
-  size: 'stretch',
-  minWidth: 300,
-  maxWidth: 1600,
-  minHeight: 400,
-  maxHeight: 2200,
-  showCover: true,
-  usePortrait: true,          // ← por defecto permite “una página” en portrait
-  mobileScrollSupport: true,
-  flippingTime: 1000
+const pageFlip=new St.PageFlip(root,{
+  size:'fixed',
+  width:Math.floor(root.clientWidth/2),
+  height:root.clientHeight,
+  showCover:true,
+  usePortrait:true,
+  flippingTime:1000
 });
 pageFlip.loadFromHTML(domPages);
 
-/* ====== Forzar DOBLE en landscape, UNA en portrait ====== */
-function applyOrientationMode(){
-  // true => PageFlip permite “una página”; false => fuerza doble hoja
-  const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-  pageFlip.setOptions({ usePortrait: isPortrait });
-  pageFlip.update();
-}
-
-const onResize = () => pageFlip.update();
-
-window.addEventListener('resize', onResize, { passive: true });
-window.addEventListener('orientationchange', () => {
-  applyOrientationMode();
-  onResize();
-}, { passive: true });
-
-// iOS barras/visibilidad
-window.addEventListener('visibilitychange', onResize);
-
-// Primera aplicación
-applyOrientationMode();
 /* ===========================
    NUMERACIÓN
 =========================== */
