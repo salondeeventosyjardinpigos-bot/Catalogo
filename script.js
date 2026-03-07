@@ -1,4 +1,4 @@
-  'use strict';
+'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -223,7 +223,7 @@ for (const k of CATEGORIES){
     firstIndexByCat['Ubicacion'] = pages.length;
   }
 
-  const mapsUrl = 'https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju%C3%A9rez,+M%C3%A9x.,+M%C3%A9xico/@19.3700759,-99.7664634,17z/data=!3m1!4b1!4m6!3m5!1s0x85d279a6c6dc32ef:0x88e46e428e82e6ff!8m2!3d19.3700759!4d-99.7638831!16s%2Fg%2F11hbqks6x6?entry=ttu&g_ep=EgoyMDI2MDIyNC4wIKXMDSoASAFQAw%3D%3D';
+  const mapsUrl = 'https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju%C3%A9rez,+M%C3%A9x.,+M%C3%A9xico/@19.3700759,-99.7664634,17z/data=!3m1!4b1!4m6!3m5!1s0x85d279a6c6dc32ef:0x88e46e428e82e6ff!8m2!3d19.3700759!4d-99.7638831!16s%2Fg%2F11hbqks6x6?entry=ttu';
 
   const section = E('section', { class: 'contact contact-ubicacion' },
 
@@ -243,7 +243,7 @@ for (const k of CATEGORIES){
       E('p', { class: 'qr-note' }, 'Toca el código QR para abrir Google Maps')
     ),
 
-    // Links sociales (iconos más grandes y con destino)
+    // Links sociales
     E('div', { class: 'links' },
       E('a', {
           class: 'social',
@@ -275,23 +275,66 @@ for (const k of CATEGORIES){
   p.appendChild(section);
   pages.push(p);
 }
-/* ===========================
-   INIT FLIPBOOK
-=========================== */
-pages.forEach(pg=>book.appendChild(pg));
 
-// Mismo NodeList que verá PageFlip
+/* ===========================
+   INIT FLIPBOOK (MÓVIL, AJUSTE EXACTO)
+=========================== */
+pages.forEach(pg => book.appendChild(pg));
 const domPages = Array.from(book.querySelectorAll('.page'));
 
-const pageFlip=new St.PageFlip(root,{
-  size:'fixed',
-  width:Math.floor(root.clientWidth/2),
-  height:root.clientHeight,
-  showCover:true,
-  usePortrait:true,
-  flippingTime:1000
+// 1) Inicializa en 'fixed' (control exacto de ancho/alto por JS)
+const pageFlip = new St.PageFlip(root, {
+  size: 'fixed',
+  width: 360,   // placeholders; se corrigen en fitMobile()
+  height: 640,
+  showCover: true,
+  usePortrait: true,      // portrait = 1 hoja (se alterna en fitMobile)
+  mobileScrollSupport: true,
+  flippingTime: 1000,
+  drawShadow: true,
+  maxShadowOpacity: 0.18
 });
 pageFlip.loadFromHTML(domPages);
+
+/**
+ * 2) Calcula viewport real y ajusta:
+ *    - Portrait:  una hoja → width = vw
+ *    - Landscape: dos hojas → width = vw / 2
+ *    - Alto = vh
+ */
+function fitMobile(){
+  const vw = Math.max(1, window.innerWidth  || document.documentElement.clientWidth  || 0);
+  const vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 0);
+  const isPortrait = vw <= vh;
+
+  // Dimensiones de UNA página
+  const pageW = isPortrait ? vw : Math.floor(vw / 2);
+  const pageH = vh;
+
+  // Ajusta el contenedor para que coincida con el viewport
+  root.style.width  = vw + 'px';
+  root.style.height = vh + 'px';
+
+  // Aplica a PageFlip y refresca
+  pageFlip.setOptions({
+    size: 'fixed',
+    width: pageW,
+    height: pageH,
+    usePortrait: isPortrait
+  });
+  pageFlip.update();
+}
+
+// 3) Eventos (debounce)
+let _tid;
+function requestFit(){ clearTimeout(_tid); _tid = setTimeout(fitMobile, 50); }
+
+window.addEventListener('orientationchange', requestFit, { passive:true });
+window.addEventListener('resize', requestFit, { passive:true });
+window.addEventListener('visibilitychange', requestFit);
+
+// 4) Primera medida
+fitMobile();
 
 /* ===========================
    NUMERACIÓN
@@ -383,4 +426,4 @@ document.addEventListener('pointerdown', (ev)=>{
   pageFlip.turnToPage(idx);                     // 0‑based real
 }, true);
 
-}); // FIN DOMContentLoaded                                                 /*
+}); // FIN DOMContentLoaded
