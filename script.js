@@ -277,12 +277,12 @@ for (const k of CATEGORIES){
 }
 
 /* ===========================
-   INIT FLIPBOOK (MÓVIL, AJUSTE EXACTO)
+   INIT FLIPBOOK (MÓVIL, ajuste exacto y clics fiables)
 =========================== */
 pages.forEach(pg => book.appendChild(pg));
 const domPages = Array.from(book.querySelectorAll('.page'));
 
-// 1) Inicializa en 'fixed' (control exacto de ancho/alto por JS)
+// 1) Inicializa en 'fixed' (control exacto del tamaño)
 const pageFlip = new St.PageFlip(root, {
   size: 'fixed',
   width: 360,   // placeholders; se corrigen en fitMobile()
@@ -297,7 +297,7 @@ const pageFlip = new St.PageFlip(root, {
 pageFlip.loadFromHTML(domPages);
 
 /**
- * 2) Calcula viewport real y ajusta:
+ * 2) Ajusta al viewport REAL del móvil:
  *    - Portrait:  una hoja → width = vw
  *    - Landscape: dos hojas → width = vw / 2
  *    - Alto = vh
@@ -307,15 +307,12 @@ function fitMobile(){
   const vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 0);
   const isPortrait = vw <= vh;
 
-  // Dimensiones de UNA página
   const pageW = isPortrait ? vw : Math.floor(vw / 2);
   const pageH = vh;
 
-  // Ajusta el contenedor para que coincida con el viewport
   root.style.width  = vw + 'px';
   root.style.height = vh + 'px';
 
-  // Aplica a PageFlip y refresca
   pageFlip.setOptions({
     size: 'fixed',
     width: pageW,
@@ -325,21 +322,36 @@ function fitMobile(){
   pageFlip.update();
 }
 
-// 3) Eventos (debounce)
+// Eventos para recalcular
 let _tid;
-function requestFit(){ clearTimeout(_tid); _tid = setTimeout(fitMobile, 50); }
-
+const requestFit = () => { clearTimeout(_tid); _tid = setTimeout(fitMobile, 50); };
 window.addEventListener('orientationchange', requestFit, { passive:true });
 window.addEventListener('resize', requestFit, { passive:true });
 window.addEventListener('visibilitychange', requestFit);
-
-// 4) Primera medida
 fitMobile();
 
 /* ===========================
-   NUMERACIÓN
+   HOME / ÍNDICE (en pointerdown para ganar al flip)
 =========================== */
-book.querySelectorAll('.page').forEach((p,i)=> p.dataset.pageno=i+1);
+document.addEventListener('pointerdown', (ev)=>{
+  // Botón Home
+  const goHome = ev.target.closest('.js-go-index,.fab-home');
+  if (goHome){
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    pageFlip.turnToPage(INDEX_PAGE);
+    return;
+  }
+  // Índice -> categoría
+  const row = ev.target.closest('.index .row');
+  if (row){
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    const key = row.dataset.goto;
+    const idx = firstIndexByCat[key];
+    if (typeof idx === 'number') pageFlip.turnToPage(idx);
+  }
+}, true);
 
 /* ===========================
    LIGHTBOX (abre en pointerdown)

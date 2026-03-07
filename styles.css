@@ -1,5 +1,5 @@
 /* =====================
-   PIGO'S – Flipbook CSS (Móvil)
+   PIGO'S – Flipbook CSS (Móvil, sin cambiar layouts)
    ===================== */
 :root{
   --brand-blue:#1F4E79;
@@ -12,9 +12,23 @@
 html,body{
   height:100%;
   margin:0;
-  /* Fondo claro para que no se vea “marco” oscuro */
-  background:#e9eef3;
+  background:#e9eef3; /* contenedor claro para evitar “marco” oscuro */
   font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+}
+
+/* Contenedor del libro (solo móvil) */
+@media (max-width: 900px) {
+  .flipbook-root{
+    position: relative;
+    width: 100vw;
+    max-width: 100vw;
+    /* El alto REAL lo pondrá el JS (fitMobile), dejamos fallback */
+    height: 100svh; height: 100dvh; height: 100vh;
+    margin: 0;
+    background:#e9eef3;
+    border-radius:0;
+    overflow:hidden;
+  }
 }
 
 /* Página */
@@ -23,39 +37,19 @@ html,body{
   background:var(--paper); padding:20px 28px 28px;
 }
 
-/* ==== Sólo móviles: el flipbook ocupa la PANTALLA COMPLETA ==== */
-@media (max-width: 900px) {
-  .flipbook-root{
-    position: relative;
-    width: 100vw;
-    max-width: 100vw;
-    /* El alto REAL lo define el JS (fitMobile), pero dejamos fallback */
-    height: 100svh;
-    height: 100dvh;
-    height: 100vh;
-    margin: 0;
-    background:#e9eef3;  /* contenedor claro */
-    border-radius:0;
-    overflow:hidden;
-  }
-}
-
-/* Mejoras de scroll/tacto en móvil */
-html, body {
-  overscroll-behavior: contain;
-  touch-action: pan-y;
-}
-
-/* ====== StPageFlip (HTML mode) – forzar páginas y gutter en blanco ====== */
+/* Hojas BLANCAS en StPageFlip (HTML mode) */
 .stf__page,
 .stf__item,
 .stf__wrapper,
-.stf__block { background: #fff !important; }     /* hoja blanca */
+.stf__block { background:#fff !important; }     /* hoja blanca */
 .stf__inner,
-.stf__outer { background: #fff !important; }     /* gutter blanco */
-.stf__book  { background: #f7f7f7 !important; }  /* área de trabajo clara */
+.stf__outer { background:#fff !important; }     /* gutter blanco */
+.stf__book  { background:#f7f7f7 !important; }  /* “mesa” clara */
 
-/* Títulos base */
+/* Mejoras de scroll/tacto en móvil */
+html, body { overscroll-behavior: contain; touch-action: pan-y; }
+
+/* ======== TIPOGRAFÍA / ESTRUCTURA QUE YA TENÍAS ======== */
 .h1{font-size:44px;font-weight:900;color:var(--brand-blue);letter-spacing:.02em;margin:0 0 8px}
 .h2{font-size:30px;font-weight:800;color:var(--brand-blue);margin:0 0 12px}
 .h3{font-size:20px;font-weight:700;color:#333;margin:0 0 8px}
@@ -92,26 +86,7 @@ html, body {
   color:#fff; font-weight:800; font-size:21px; cursor:pointer;
 }
 .index .row:hover{ background:rgba(255,255,255,.12); }
-/* bullets grandes */
-.index .row img{ width:32px; height:32px; object-fit:contain; filter:none; background:transparent; }
-
-/* Topbar sólo en Índice (centrada) */
-.index .topbar--index{
-  position:absolute; left:50%; top:8px; transform:translateX(-50%);
-  display:flex; justify-content:center; align-items:center; gap:10px;
-  z-index:20000; pointer-events:auto;
-  padding:8px 12px; background:rgba(255,255,255,.92);
-  border:1px solid rgba(0,0,0,.08); border-radius:12px;
-  backdrop-filter: blur(4px);
-  box-shadow:0 6px 16px rgba(0,0,0,.12);
-}
-.index .topbar--index .btn{
-  display:inline-flex; align-items:center; gap:6px;
-  background:#f6f7f9; border:1px solid #d8dbe2; color:#203040;
-  padding:6px 12px; border-radius:10px; font-weight:700; text-decoration:none;
-  white-space:nowrap; box-shadow:0 1px 4px rgba(0,0,0,.06);
-}
-.index .topbar--index .btn:hover{ background:#eef1f5; }
+.index .row img{ width:32px; height:32px; object-fit:contain; }
 
 /* Título premium + logo a la izquierda */
 .title-bar{ display:flex; justify-content:center; align-items:center; margin-top:12px; margin-bottom:10px; }
@@ -146,7 +121,7 @@ html, body {
 }
 .fab-home:hover{ color:#0e2747 !important; background:#f7f9fb !important; }
 
-/* Rejillas base */
+/* Rejillas base (SIN cambios responsivos que apilen columnas) */
 .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
 .grid-7{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
 .grid-7 .span-2{ grid-column:span 2; }
@@ -172,8 +147,8 @@ html, body {
 .layout-132 .img-card:nth-child(1){ grid-area:A; }
 .layout-132 .img-card:nth-child(2){ grid-area:B1; }
 .layout-132 .img-card:nth-child(3){ grid-area:B2; }
-/* (fix) Eliminamos la línea con el typo grid-area&gt;B3; */
-.layout-132 .img-card:nth-child(4){ grid-area:B3; } /* corrección */
+/* (fix de typo) */
+.layout-132 .img-card:nth-child(4){ grid-area:B3; }
 .layout-132 .img-card:nth-child(5){ grid-area:C1; }
 .layout-132 .img-card:nth-child(6){ grid-area:C2; }
 .layout-132 > .img-card:nth-child(n+7){ grid-column:1 / -1; height:240px; }
@@ -189,11 +164,6 @@ html, body {
 .lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:9999; }
 .lightbox.open{ display:flex; }
 .lightbox img{ max-width:92vw; max-height:92vh; border-radius:8px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
-.lightbox .nav{
-  position:absolute; top:50%; transform:translateY(-50%); font-size:34px; color:#fff;
-  background:rgba(0,0,0,.35); width:46px; height:46px; border-radius:50%;
-  display:flex; align-items:center; justify-content:center; cursor:pointer; user-select:none;
-}
 .lightbox .prev{ left:16px; }
 .lightbox .next{ right:16px; }
 .lightbox .close{ position:absolute; top:14px; right:14px; width:42px; height:42px; font-size:20px; }
@@ -207,23 +177,4 @@ html, body {
 .contact .social img{ width:34px; height:34px; object-fit:contain; }
 .contact .social a{ color:var(--brand-blue); font-weight:800; text-decoration:none; }
 
-/* Responsive internos de layouts (los que ya tenías) */
-@media (max-width: 1000px){
-  .layout-3-split{ grid-template-columns: 1.6fr 1fr; gap: 14px; }
-  .layout-6-hero-3-2{ gap: 14px; }
-}
-@media (max-width: 620px){
-  .layout-1-hero .img-card,
-  .layout-2-split .img-card,
-  .layout-3-split .img-card,
-  .layout-4-2x2 .img-card,
-  .layout-6-hero-3-2 .img-card{ height:auto; aspect-ratio: 4 / 3; }
-
-  .layout-2-split{ grid-template-columns: 1fr; grid-auto-rows: auto; }
-  .layout-3-split{ grid-template-columns: 1fr; grid-template-rows: none; }
-  .layout-4-2x2{ grid-template-columns: 1fr; grid-template-rows: none; }
-
-  .layout-6-hero-3-2{ grid-template-columns: 1fr; grid-template-rows: none; }
-  .layout-3-split .img-card:nth-child(n),
-  .layout-6-hero-3-2 .img-card:nth-child(n){ grid-column: 1; grid-row: auto; }
-}
+/* (Eliminados los @media que cambiaban layouts en móvil) */
