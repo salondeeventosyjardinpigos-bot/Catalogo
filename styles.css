@@ -1,4 +1,4 @@
-/* =====================
+=====================
    PIGO'S – Flipbook CSS
    ===================== */
 :root{
@@ -457,4 +457,58 @@ html,body{
 @media (max-width: 520px){
   .contact-ubicacion .qr-block img{ width: 220px; }
   .contact-ubicacion .social img{ width: 46px; height: 46px; }
+}
+
+/* ==== Sólo móviles: el flipbook ocupa la pantalla completa ==== */
+@media (max-width: 900px) {
+  .flipbook-root{
+    /* ancho completo con un pequeño margen interior */
+    width: 100vw;
+    max-width: 100vw;
+    /* alto real de la pantalla (svh/dvh con fallback) */
+    height: 100svh;
+    height: 100dvh;
+    height: 100vh;
+    margin: 0;
+    background:#111;
+    border-radius:0;
+    overflow:hidden;
+  }
+}
+
+/* (Opcional) En caso de que quieras ocultar barras de desplazamiento raíz en móvil */
+html, body {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+/* ====== StPageFlip (HTML mode) – forzar páginas y gutter en blanco ====== */
+
+/* Superficie de cada página renderizada por la librería */
+.stf__page,
+.stf__item,
+.stf__wrapper,
+.stf__block {
+  background: #fff !important; /* hoja blanca siempre */
+}
+
+/* Canal central / interior (reduce el efecto de “marco” negro) */
+.stf__inner,
+.stf__outer {
+  background: #fff !important;
+}
+
+/* Área de “trabajo” del render (detrás de las páginas) */
+.stf__book {
+  background: #f7f7f7 !important; /* un gris muy claro, casi blanco */
+}
+
+/* (Opcional) Si quieres que TODO el contenedor luzca claro */
+.flipbook-root {
+  background: #e9eef3; /* cambia #111 por un claro si no quieres marco oscuro */
+}
+
+/* Asegúrate de que tu propio .page también es blanca (ya lo tenías) */
+.page {
+  background: #fff;
 }

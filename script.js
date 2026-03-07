@@ -1,4 +1,4 @@
-'use strict';
+  'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -383,4 +383,4 @@ document.addEventListener('pointerdown', (ev)=>{
   pageFlip.turnToPage(idx);                     // 0‑based real
 }, true);
 
-}); // FIN DOMContentLoaded
+}); // FIN DOMContentLoaded                                                 /*
