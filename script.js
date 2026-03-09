@@ -1,4 +1,438 @@
-"use strict";document.addEventListener("DOMContentLoaded",()=>{const g=document.querySelector(".flipbook-root"),d=document.getElementById("book");if(!g||!d){console.error("\u274C Falta .flipbook-root o #book en el HTML");return}if(!window.St||!St.PageFlip){console.error("\u274C No carg\xF3 PageFlip");return}const C=["Manteleria","PastoSintetico","Carpas","Charcuteria","Desayunos","Mobiliario","Tapes","Cafe","Jardin","Salon","MesaDeDulces","Salas","PlatosBase","Copas","PistaLED","Inflables","Sillones","MesaDeNovios","Letras","Ubicacion"],j={PastoSintetico:["images/PastoSintetico/pasto1.jpeg","images/PastoSintetico/pasto2.jpeg","images/PastoSintetico/pasto3.jpeg"],Manteleria:Array.from({length:18},(e,a)=>`images/Manteleria/manteleria${a+1}.jpeg`),Carpas:Array.from({length:16},(e,a)=>`images/Carpas/Carpas${a+1}.jpeg`),Charcuteria:Array.from({length:18},(e,a)=>`images/Charcuteria/Charcuteria${a+1}.jpeg`),Desayunos:Array.from({length:10},(e,a)=>`images/Desayunos/Desayunos${a+1}.jpeg`),Mobiliario:Array.from({length:20},(e,a)=>`images/Mobiliario/Mobiliario${a+1}.jpeg`),Tapes:["images/Tapes/tape1.jpeg"],Cafe:Array.from({length:5},(e,a)=>`images/Cafe/Cafe${a+1}.jpeg`),Jardin:["images/Jardin/Jardin1.jpeg","images/Jardin/Jardin2.jpeg","images/Jardin/Jardin3.jpeg"],Salon:["images/Salon/Salon1.jpeg","images/Salon/salon2.jpeg","images/Salon/salon3.jpeg"],MesaDeDulces:Array.from({length:7},(e,a)=>`images/MesaDeDulces/MesadeDulces${a+1}.jpeg`),Salas:["images/Salas/sala1.jpeg","images/Salas/sala2.jpeg"],PlatosBase:["images/PlatosBase/platobase1.jpeg","images/PlatosBase/platobase2.jpeg","images/PlatosBase/platobase3.jpeg","images/PlatosBase/platobase4.jpeg","images/PlatosBase/platobase5.jpeg"],Copas:Array.from({length:5},(e,a)=>`images/Copas/copa${a+1}.jpeg`),PistaLED:["images/PistaLED/pistas led.jpeg"],Inflables:["images/Inflables/inflables.jpeg"],Sillones:["images/Sillones/sillones.jpeg"],MesaDeNovios:["images/MesaDeNovios/mesa de novios.jpeg"],Letras:["images/Letras/Letras.jpeg"],Ubicacion:[]},t=(e,a={},...i)=>{const s=document.createElement(e);for(const[o,l]of Object.entries(a))o==="class"?s.className=l:o==="dataset"?Object.assign(s.dataset,l):s.setAttribute(o,l);return i.flat().forEach(o=>{typeof o=="string"?s.appendChild(document.createTextNode(o)):o&&s.appendChild(o)}),s},y=(e,a)=>{const i=[];for(let s=0;s<e.length;s+=a)i.push(e.slice(s,s+a));return i},m=(e="soft")=>{const a=t("div",{class:"page"});return a.dataset.density=e,a},w=(e,a)=>{const i=t("div",{class:a});return e.forEach(s=>{const o=s.split("/"),l=o.pop(),p=o.join("/"),n=l.replace(/\.(jpe?g|png)$/i,""),c=p.replace(/^images\//,""),h=`images/thumbs/${c}/${n}.webp`,x=`images/webp/${c}/${n}.webp`,v=t("a",{href:"#",class:"img-card js-lightbox","data-full":x}),b=t("img",{loading:"lazy",decoding:"async",src:encodeURI(h),alt:""});b.onerror=()=>{b.onerror=null,b.src=encodeURI(s)},v.appendChild(b),i.appendChild(v)}),i},r=[],u=Object.create(null);{const e=m("hard"),a=t("section",{class:"cover-custom"},t("div",{class:"left-side"},t("div",{class:"marble"})),t("div",{class:"right-side"},t("h1",{class:"title-cover"},"NUESTROS",t("br"),"PRODUCTOS",t("br"),"PIGO\xB4S"),t("div",{class:"author"},"Jos\xE9 Antonio G\xF3mez Dom\xEDnguez"),t("div",{class:"phone"},"7226307655")));e.appendChild(a),r.push(e)}const D=r.length;{const e=m("hard"),a=t("div",{class:"cols"});C.forEach(i=>{const s=t("div",{class:"row",dataset:{goto:i}});s.appendChild(t("img",{src:"assets/bullet.png",alt:""}));const o=i.replace(/([A-Z])/g," $1").trim().replace("De ","de ");s.appendChild(t("span",{},o)),a.appendChild(s)}),e.appendChild(t("section",{class:"index"},t("div",{class:"bg"}),t("div",{class:"wrap"},t("h1",{class:"title"},"\xCDNDICE"),a))),r.push(e)}function S(e,a,i){i?.length&&y(i,6).forEach((s,o)=>{const l=s.length,p=l===1?"layout-1-hero":l===2?"layout-2-split":l===3?"layout-3-split":l===4?"layout-4-2x2":"layout-6-hero-3-2",n=m(),c=t("div",{class:"cat-page"});o===0&&(n.dataset.cat=a,u[a]=r.length),c.appendChild(t("div",{class:"title-bar"},t("h2",{class:"h2 title-with-logo"},t("img",{class:"title-logo",src:"assets/logo_circle.png",alt:""}),t("span",{class:"title-text"},e)))),c.appendChild(w(s,p)),n.appendChild(c),n.appendChild(t("a",{href:"#",class:"fab-home js-go-index","aria-label":"Regresar al \xEDndice"},(()=>{const h=t("svg",{viewBox:"0 0 24 24",width:"22",height:"22"});return h.appendChild(t("path",{fill:"currentColor",d:"M10.707 2.293a1 1 0 0 1 1.414 0l9 9a1 1 0 1 1-1.414 1.414L20 12.414V20a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5H11v5a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2v-7.586l-.707.707A1 1 0 0 1 1.879 11.293l9-9Z"})),h})())),r.push(n)})}for(const e of C)S(e.replace(/([A-Z])/g," $1").replace(/^ /,"").replace("De ","de "),e,j[e]);{const e=m();e.dataset.cat="Ubicacion",u.Ubicacion=r.length;const a=t("section",{class:"contact contact-ubicacion"},t("div",{class:"title-bar"},t("h2",{class:"h2 title-with-logo"},t("img",{class:"title-logo",src:"assets/logo_circle.png",alt:""}),t("span",{class:"title-text"},"UBICACI\xD3N & CONTACTO"))),t("div",{class:"qr-block"},t("a",{href:"https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju%C3%A9rez,+M%C3%A9x.,+M%C3%A9xico/@19.3700759,-99.7664634,17z/data=!3m1!4b1!4m6!3m5!1s0x85d279a6c6dc32ef:0x88e46e428e82e6ff!8m2!3d19.3700759!4d-99.7638831!16s%2Fg%2F11hbqks6x6?entry=ttu",target:"_blank",rel:"noopener"},t("img",{src:"assets/ubi.jpeg",alt:"Abrir en Google Maps"})),t("p",{class:"qr-note"},"Toca el c\xF3digo QR para abrir Google Maps")),t("div",{class:"links"},t("a",{class:"social",href:"https://wa.me/527226307655?text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n",target:"_blank",rel:"noopener"},t("img",{src:"assets/WHATS.jpg",alt:"WhatsApp"}),t("span",{},"WhatsApp: 722 630 7655")),t("a",{class:"social",href:"https://www.instagram.com/pigosalquiler/",target:"_blank",rel:"noopener"},t("img",{src:"assets/INSTA.jpg",alt:"Instagram"}),t("span",{},"@pigosalquiler")),t("a",{class:"social",href:"https://www.facebook.com/share/1DDrS8JTB6/?mibextid=wwXIfr",target:"_blank",rel:"noopener"},t("img",{src:"assets/FACE.jpg",alt:"Facebook"}),t("span",{},"Facebook"))));e.appendChild(a),r.push(e)}r.forEach(e=>d.appendChild(e));const A=Array.from(d.querySelectorAll(".page")),f=new St.PageFlip(g,{size:"fixed",width:Math.floor(g.clientWidth/2),height:g.clientHeight,showCover:!0,usePortrait:!0,flippingTime:1e3,mobileScrollSupport:!0});f.loadFromHTML(A),d.querySelectorAll(".page").forEach((e,a)=>e.dataset.pageno=a+1),(function(){const e=document.createElement("div");e.className="lightbox",e.innerHTML=`
+'use strict';
+
+document.addEventListener('DOMContentLoaded', () => {
+
+/* ===========================
+   ROOTS Y VERIFICACIÓN
+=========================== */
+const root = document.querySelector('.flipbook-root');
+const book = document.getElementById('book');
+
+if (!root || !book){
+  console.error("❌ Falta .flipbook-root o #book en el HTML");
+  return;
+}
+if (!window.St || !St.PageFlip){
+  console.error("❌ No cargó PageFlip");
+  return;
+}
+
+/* ===========================
+   DATOS
+=========================== */
+const CATEGORIES = [
+  'Manteleria','PastoSintetico','Carpas','Charcuteria','Desayunos','Mobiliario',
+  'Tapes','Cafe','Jardin','Salon','MesaDeDulces','Salas','PlatosBase','Copas',
+  'PistaLED','Inflables','Sillones','MesaDeNovios','Letras','Ubicacion'
+];
+
+const IMAGES = {
+  PastoSintetico: ['images/PastoSintetico/pasto1.jpeg','images/PastoSintetico/pasto2.jpeg','images/PastoSintetico/pasto3.jpeg'],
+  Manteleria: Array.from({length:18}, (_,i)=>`images/Manteleria/manteleria${i+1}.jpeg`),
+  Carpas: Array.from({length:16}, (_,i)=>`images/Carpas/Carpas${i+1}.jpeg`),
+  Charcuteria: Array.from({length:18}, (_,i)=>`images/Charcuteria/Charcuteria${i+1}.jpeg`),
+  Desayunos: Array.from({length:10}, (_,i)=>`images/Desayunos/Desayunos${i+1}.jpeg`),
+  Mobiliario: Array.from({length:20}, (_,i)=>`images/Mobiliario/Mobiliario${i+1}.jpeg`),
+  Tapes: ['images/Tapes/tape1.jpeg'],
+  Cafe: Array.from({length:5}, (_,i)=>`images/Cafe/Cafe${i+1}.jpeg`),
+  Jardin: ['images/Jardin/Jardin1.jpeg','images/Jardin/Jardin2.jpeg','images/Jardin/Jardin3.jpeg'],
+  Salon: ['images/Salon/Salon1.jpeg','images/Salon/salon2.jpeg','images/Salon/salon3.jpeg'],
+  MesaDeDulces: Array.from({length:7}, (_,i)=>`images/MesaDeDulces/MesadeDulces${i+1}.jpeg`),
+  Salas: ['images/Salas/sala1.jpeg','images/Salas/sala2.jpeg'],
+  PlatosBase: [
+    'images/PlatosBase/platobase1.jpeg','images/PlatosBase/platobase2.jpeg',
+    'images/PlatosBase/platobase3.jpeg','images/PlatosBase/platobase4.jpeg',
+    'images/PlatosBase/platobase5.jpeg'
+  ],
+  Copas: Array.from({length:5}, (_,i)=>`images/Copas/copa${i+1}.jpeg`),
+  PistaLED: ['images/PistaLED/pistas led.jpeg'],
+  Inflables: ['images/Inflables/inflables.jpeg'],
+  Sillones: ['images/Sillones/sillones.jpeg'],
+  MesaDeNovios: ['images/MesaDeNovios/mesa de novios.jpeg'],
+  Letras: ['images/Letras/Letras.jpeg'],
+  Ubicacion: []
+};
+
+/* ===========================
+   HELPERS
+=========================== */
+const E = (tag, attrs={}, ...children)=>{
+  const el=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs)){
+    if (k === 'class') el.className = v;
+    else if (k === 'dataset') Object.assign(el.dataset, v);   // ✅ data-*
+    else el.setAttribute(k, v);
+  }
+  children.flat().forEach(ch=>{
+    if (typeof ch === 'string') el.appendChild(document.createTextNode(ch));
+    else if (ch) el.appendChild(ch);
+  });
+  return el;
+};
+
+const chunk=(arr,size)=>{
+  const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size));
+  return out;
+};
+
+const pageDom=(density='soft')=>{
+  const p=E('div',{class:'page'}); p.dataset.density=density; return p;
+};
+
+/* ===========================
+   GRID (Optimizado: THUMBS en grid + FULL en data-full)
+=========================== */
+const gridDom = (images, cls)=>{
+  const wrap = E('div',{class:cls});
+  images.forEach(raw=>{
+    // Deriva rutas WebP (thumb y full) manteniendo subcarpetas
+    const parts = raw.split('/');
+    const file  = parts.pop(); // ej: manteleria1.jpeg
+    const dir   = parts.join('/'); // ej: images/Manteleria
+    const base  = file.replace(/\.(jpe?g|png)$/i,'');
+    const sub   = dir.replace(/^images\//,''); // ej: Manteleria
+
+    const thumb = `images/thumbs/${sub}/${base}.webp`;
+    const full  = `images/webp/${sub}/${base}.webp`;
+
+    const a   = E('a',{href:'#',class:'img-card js-lightbox','data-full': full});
+    const img = E('img',{
+      loading:'lazy',
+      decoding:'async',
+      src: encodeURI(thumb),
+      alt:''
+    });
+
+    // Fallback de red si aún no existen thumbs
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = encodeURI(raw);
+    };
+
+    a.appendChild(img);
+    wrap.appendChild(a);
+  });
+  return wrap;
+};
+
+/* ===========================
+   BUILD PAGES
+=========================== */
+const pages=[];
+
+// 🔹 Mapa robusto: primera página (0-based) de cada categoría
+const firstIndexByCat = Object.create(null);
+
+/* ---- PORTADA ---- */
+{
+  const p=pageDom('hard');
+  const section=E('section',{class:'cover-custom'},
+    E('div',{class:'left-side'}, E('div',{class:'marble'})),
+    E('div',{class:'right-side'},
+      E('h1',{class:'title-cover'},"NUESTROS",E('br'),"PRODUCTOS",E('br'),"PIGO´S"),
+      E('div',{class:'author'},'José Antonio Gómez Domínguez'),
+      E('div',{class:'phone'},'7226307655')
+    )
+  );
+  p.appendChild(section);
+  pages.push(p);
+}
+
+/* ---- ÍNDICE ---- */
+const INDEX_PAGE = pages.length;
+{
+  const p = pageDom('hard');
+
+  const cols = E('div',{class:'cols'});
+  CATEGORIES.forEach(c=>{
+    const row = E('div',{class:'row',dataset:{goto:c}});
+    row.appendChild(E('img',{src:'assets/bullet.png',alt:''}));
+    const nice = c.replace(/([A-Z])/g,' $1').trim().replace('De ','de ');
+    row.appendChild(E('span',{}, nice));
+    cols.appendChild(row);
+  });
+
+  p.appendChild(
+    E('section',{class:'index'},
+      E('div',{class:'bg'}),
+      E('div',{class:'wrap'},
+        E('h1',{class:'title'},'ÍNDICE'),
+        cols
+      )
+    )
+  );
+  pages.push(p);
+}
+
+/* ---- CATEGORÍAS ---- */
+function addCategory(title,key,imgs){
+  if(!imgs?.length) return;
+  const groups=chunk(imgs,6);
+
+  groups.forEach((group, groupIdx)=>{
+    const n=group.length;
+    const gridClass =
+      n===1?'layout-1-hero':
+      n===2?'layout-2-split':
+      n===3?'layout-3-split':
+      n===4?'layout-4-2x2':'layout-6-hero-3-2';
+
+    const p   = pageDom();
+    const cat = E('div',{class:'cat-page'});
+
+    if (groupIdx === 0) {
+      p.dataset.cat = key;
+      firstIndexByCat[key] = pages.length;
+    }
+
+    // Título
+    cat.appendChild(
+      E('div',{class:'title-bar'},
+        E('h2',{class:'h2 title-with-logo'},
+          E('img',{class:'title-logo',src:'assets/logo_circle.png',alt:''}),
+          E('span',{class:'title-text'},title)
+        )
+      )
+    );
+
+    // Grid
+    cat.appendChild( gridDom(group,gridClass) );
+    p.appendChild(cat);
+
+    // FAB Home
+    p.appendChild(
+      E('a',{href:'#',class:'fab-home js-go-index','aria-label':'Regresar al índice'},
+        (()=>{
+          const svg=E('svg',{viewBox:'0 0 24 24',width:'22',height:'22'});
+          svg.appendChild(E('path',{fill:'currentColor',
+            d:'M10.707 2.293a1 1 0 0 1 1.414 0l9 9a1 1 0 1 1-1.414 1.414L20 12.414V20a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5H11v5a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2v-7.586l-.707.707A1 1 0 0 1 1.879 11.293l9-9Z'}));
+          return svg;
+        })()
+      )
+    );
+
+    pages.push(p);
+  });
+}
+
+for (const k of CATEGORIES){
+  addCategory(
+    k.replace(/([A-Z])/g,' $1').replace(/^ /,'').replace('De ','de '),
+    k,
+    IMAGES[k]
+  );
+}
+
+/* ---- UBICACIÓN (página especial) ---- */
+{
+  const p = pageDom();
+  p.dataset.cat = 'Ubicacion';
+  firstIndexByCat['Ubicacion'] = pages.length;
+
+  const mapsUrl = 'https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju%C3%A9rez,+M%C3%A9x.,+M%C3%A9xico/@19.3700759,-99.7664634,17z/data=!3m1!4b1!4m6!3m5!1s0x85d279a6c6dc32ef:0x88e46e428e82e6ff!8m2!3d19.3700759!4d-99.7638831!16s%2Fg%2F11hbqks6x6?entry=ttu';
+
+  const section = E('section', { class: 'contact contact-ubicacion' },
+    E('div', { class: 'title-bar' },
+      E('h2', { class: 'h2 title-with-logo' },
+        E('img', { class: 'title-logo', src: 'assets/logo_circle.png', alt: '' }),
+        E('span', { class: 'title-text' }, 'UBICACIÓN & CONTACTO')
+      )
+    ),
+    E('div', { class: 'qr-block' },
+      E('a', { href: mapsUrl, target: '_blank', rel: 'noopener' },
+        E('img', { src: 'assets/ubi.jpeg', alt: 'Abrir en Google Maps' })
+      ),
+      E('p', { class: 'qr-note' }, 'Toca el código QR para abrir Google Maps')
+    ),
+    E('div', { class: 'links' },
+      E('a', { class: 'social', href: 'https://wa.me/527226307655?text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n', target: '_blank', rel: 'noopener' },
+        E('img', { src: 'assets/WHATS.jpg', alt: 'WhatsApp' }), E('span', {}, 'WhatsApp: 722 630 7655')),
+      E('a', { class: 'social', href: 'https://www.instagram.com/pigosalquiler/', target: '_blank', rel: 'noopener' },
+        E('img', { src: 'assets/INSTA.jpg', alt: 'Instagram' }), E('span', {}, '@pigosalquiler')),
+      E('a', { class: 'social', href: 'https://www.facebook.com/share/1DDrS8JTB6/?mibextid=wwXIfr', target: '_blank', rel: 'noopener' },
+        E('img', { src: 'assets/FACE.jpg', alt: 'Facebook' }), E('span', {}, 'Facebook'))
+    )
+  );
+
+  p.appendChild(section);
+  pages.push(p);
+}
+
+/* ===========================
+   INIT FLIPBOOK (original + mobileScrollSupport)
+=========================== */
+pages.forEach(pg=>book.appendChild(pg));
+
+const domPages = Array.from(book.querySelectorAll('.page'));
+
+const pageFlip=new St.PageFlip(root,{
+  size:'fixed',
+  width:Math.floor(root.clientWidth/2),
+  height:root.clientHeight,
+  showCover:true,
+  usePortrait:true,
+  flippingTime:1000,
+  mobileScrollSupport:true
+});
+pageFlip.loadFromHTML(domPages);
+
+/* ===== Refit por orientación (portrait=1 hoja, landscape=2) ===== */
+(function refitFlipbook(){
+  // NOTA: Algunas builds antiguas no traen setOptions; recreamos la instancia si cambia tamaño/orientación.
+
+  const domPages = Array.from(book.querySelectorAll('.page'));
+  let creating = false;
+
+  function getViewport(){
+    // Usa visualViewport si existe (más exacto con barras dinámicas)
+    const vv = window.visualViewport;
+    if (vv && vv.width && vv.height) return { vw: Math.round(vv.width), vh: Math.round(vv.height) };
+    return {
+      vw: Math.max(document.documentElement.clientWidth,  window.innerWidth  || 0),
+      vh: Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+    };
+  }
+
+  function recreateIfNeeded(){
+    if (creating) return;
+    creating = true;
+
+    const { vw, vh } = getViewport();
+    // En móvil el contenedor = viewport real (evita “cortes”)
+    if (vw <= 900) {
+      root.style.width  = vw + 'px';
+      root.style.height = vh + 'px';
+    }
+
+    const isPortrait = vh >= vw;
+    // OJO: width aquí es el ANCHO **DE UNA PÁGINA**
+    const pageW = isPortrait ? root.clientWidth : Math.floor(root.clientWidth / 2);
+    const pageH = root.clientHeight;
+
+    // Si la build no trae setOptions fiable, destruimos y recreamos
+    try { pageFlip.destroy(); } catch(_){}
+
+    window.pageFlip = new St.PageFlip(root,{
+      size:'fixed',
+      width: pageW,
+      height: pageH,
+      showCover:true,
+      usePortrait:isPortrait,    // portrait = 1 hoja
+      flippingTime: 900,
+      mobileScrollSupport: true,
+      drawShadow: true,
+      maxShadowOpacity: 0.18
+    });
+    pageFlip.loadFromHTML(domPages);
+
+    // Doble pasada para cuando la barra del navegador termina de animarse
+    setTimeout(()=>{ try{ pageFlip.update(); }catch(_){} }, 60);
+    setTimeout(()=>{ try{ pageFlip.update(); }catch(_){} }, 240);
+
+    creating = false;
+  }
+
+  // Listeners de cambio de tamaño/orientación
+  const ask = () => { clearTimeout(refitFlipbook._t); refitFlipbook._t = setTimeout(recreateIfNeeded, 60); };
+  window.addEventListener('resize', ask, {passive:true});
+  window.addEventListener('orientationchange', ask, {passive:true});
+  document.addEventListener('visibilitychange', ask);
+  if (window.visualViewport){
+    window.visualViewport.addEventListener('resize', ask, {passive:true});
+    window.visualViewport.addEventListener('scroll', ask, {passive:true});
+  }
+
+  recreateIfNeeded(); // primera medida
+})();
+
+
+/* ===========================
+   NUMERACIÓN
+=========================== */
+book.querySelectorAll('.page').forEach((p,i)=> p.dataset.pageno=i+1);
+
+/* ===========================
+   LIGHTBOX (abre en pointerdown)
+=========================== */
+(function setupLightbox(){
+  const lb = document.createElement('div');
+  lb.className = 'lightbox';
+  lb.innerHTML = `
     <button class="lb-close" type="button" aria-label="Regresar">Regresar</button>
     <img class="lb-img" alt="">
-  `,document.body.appendChild(e);const a=e.querySelector(".lb-img"),i=e.querySelector(".lb-close");function s(l){const p=l.target.closest(".img-card");if(!p)return;l.preventDefault(),l.stopImmediatePropagation();const n=p.querySelector("img");if(!n)return;const c=p.getAttribute("data-full");a.src=c||n.currentSrc||n.src,e.classList.add("open"),document.body.classList.add("lb-open")}document.addEventListener("pointerdown",s,!0);function o(){e.classList.remove("open"),document.body.classList.remove("lb-open")}e.addEventListener("click",o),i.addEventListener("click",l=>{l.preventDefault(),o()}),window.addEventListener("keydown",l=>{document.body.classList.contains("lb-open")&&l.key==="Escape"&&(l.preventDefault(),o())},!0)})(),(function(){const e=a=>{document.body.classList.contains("lb-open")&&(a.target&&a.target.closest(".lightbox")||(a.stopImmediatePropagation(),a.preventDefault()))};["pointerdown","pointermove","pointerup","mousedown","mousemove","mouseup","click","touchstart","touchmove","touchend","wheel","keydown"].forEach(a=>window.addEventListener(a,e,!0))})(),document.addEventListener("click",e=>{e.target.closest(".js-go-index,.fab-home")&&(e.preventDefault(),e.stopPropagation(),f.turnToPage(D))},!0),document.addEventListener("pointerdown",e=>{const a=e.target.closest(".index .row");if(!a)return;e.preventDefault(),e.stopImmediatePropagation();const i=a.dataset.goto,s=u[i];if(typeof s!="number"){console.warn("[\xCDNDICE] clave sin \xEDndice calculado:",i,u);return}f.turnToPage(s)},!0)});
+  `;
+  document.body.appendChild(lb);
+
+  const lbImg = lb.querySelector('.lb-img');
+  const lbBtn = lb.querySelector('.lb-close');
+
+  function openLB(ev){
+    const card = ev.target.closest('.img-card');
+    if (!card) return;
+    ev.preventDefault(); ev.stopImmediatePropagation();
+    const img = card.querySelector('img');
+    if (!img) return;
+    const full = card.getAttribute('data-full'); // << usa FULL si existe
+    lbImg.src = full || img.currentSrc || img.src;
+    lb.classList.add('open');
+    document.body.classList.add('lb-open');
+  }
+  document.addEventListener('pointerdown', openLB, true);
+
+  function closeLB(){
+    lb.classList.remove('open');
+    document.body.classList.remove('lb-open');
+  }
+  lb.addEventListener('click', closeLB);
+  lbBtn.addEventListener('click', (e)=>{ e.preventDefault(); closeLB(); });
+
+  window.addEventListener('keydown', (e)=>{
+    if (!document.body.classList.contains('lb-open')) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeLB(); }
+  }, true);
+})();
+
+/* ===========================
+   BLOQUEAR GESTOS EN ZOOM
+=========================== */
+(function blockGesturesWhileLB(){
+  const block = (ev) => {
+    if (!document.body.classList.contains('lb-open')) return;
+    if (ev.target && ev.target.closest('.lightbox')) return;
+    ev.stopImmediatePropagation(); ev.preventDefault();
+  };
+  ['pointerdown','pointermove','pointerup','mousedown','mousemove','mouseup','click','touchstart','touchmove','touchend','wheel','keydown']
+    .forEach(t => window.addEventListener(t, block, true));
+})();
+
+/* ===========================
+   HOME / ÍNDICE
+=========================== */
+document.addEventListener("click",(ev)=>{
+  const go=ev.target.closest(".js-go-index,.fab-home");
+  if(!go) return;
+  ev.preventDefault(); ev.stopPropagation();
+  pageFlip.turnToPage(INDEX_PAGE);
+}, true);
+
+/* ===========================
+   ÍNDICE → CATEGORÍA (DINÁMICO por mapa calculado)
+=========================== */
+document.addEventListener('pointerdown', (ev)=>{
+  const row = ev.target.closest('.index .row');
+  if (!row) return;
+
+  ev.preventDefault();
+  ev.stopImmediatePropagation();
+
+  const key = row.dataset.goto;                 // ej. "MesaDeDulces"
+  const idx = firstIndexByCat[key];
+
+  if (typeof idx !== 'number') {
+    console.warn('[ÍNDICE] clave sin índice calculado:', key, firstIndexByCat);
+    return;
+  }
+  pageFlip.turnToPage(idx);                     // 0‑based real
+}, true);
+
+}); // FIN DOMContentLoaded
