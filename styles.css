@@ -283,3 +283,15 @@ html,body{
 .layout-6-hero-3-2 .img-card:nth-child(4){ grid-column: 5 / span 2; grid-row: 2; }
 .layout-6-hero-3-2 .img-card:nth-child(5){ grid-column: 1 / span 3; grid-row: 3; }
 .layout-6-hero-3-2 .img-card:nth-child(6){ grid-column: 4 / span 3; grid-row: 3; }
+
+/* Solo MÓVIL: haz que el contenedor use el viewport completo */
+@media (max-width: 900px){
+  .flipbook-root{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    background:#111;
+    overflow:hidden;
+  }
+}

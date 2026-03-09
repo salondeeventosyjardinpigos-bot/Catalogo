@@ -284,6 +284,44 @@ const pageFlip=new St.PageFlip(root,{
 });
 pageFlip.loadFromHTML(domPages);
 
+/* ====== Ajuste simple de tamaño para móvil (portrait / landscape) ====== */
+(function fitFlipbook(){
+  const PF = pageFlip;
+  const R  = root;
+
+  function fit(){
+    // Medidas actuales del viewport
+    const vw = Math.max(document.documentElement.clientWidth,  window.innerWidth  || 0);
+    const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+    // En móvil hacemos que el contenedor coincida con el viewport
+    if (vw <= 900){
+      R.style.width  = vw + 'px';
+      R.style.height = vh + 'px';
+    }
+
+    // Orientación: portrait = 1 hoja; landscape = 2 hojas
+    const isPortrait = vh >= vw;
+
+    // OJO: en PageFlip `width` es ANCHO **DE UNA PÁGINA**
+    const pageW = isPortrait ? R.clientWidth : Math.floor(R.clientWidth / 2);
+    const pageH = R.clientHeight;
+
+    PF.setOptions({ width: pageW, height: pageH, usePortrait: isPortrait });
+    PF.update();
+  }
+
+  // Debounce ligero + listeners de tamaño/orientación
+  let tid;
+  const ask = () => { clearTimeout(tid); tid = setTimeout(fit, 60); };
+
+  window.addEventListener('resize', ask, {passive:true});
+  window.addEventListener('orientationchange', ask, {passive:true});
+  document.addEventListener('visibilitychange', ask);
+
+  fit(); // primera medida
+})();
+
 function fit(){
   // Viewport real (evita cortes por barras del navegador)
   const vw = Math.max(1, window.innerWidth  || document.documentElement.clientWidth  || 0);
