@@ -268,97 +268,92 @@ for (const k of CATEGORIES){
 }
 
 /* ===========================
-   INIT FLIPBOOK (ADAPTACIÓN MÓVIL SIN CAMBIAR LAYOUTS)
+   INIT FLIPBOOK (compatible con tu versión sin setOptions)
 =========================== */
-pages.forEach(pg=>book.appendChild(pg));
+pages.forEach(pg => book.appendChild(pg));
+
+// NodeList que usa PageFlip
 const domPages = Array.from(book.querySelectorAll('.page'));
 
-// Base 'fixed' (control exacto) – luego ajustamos medidas reales con fit()
-const pageFlip=new St.PageFlip(root,{
-  size:'fixed',
-  width:400,             // placeholders; se corrigen en fit()
-  height:600,
-  showCover:true,
-  usePortrait:true,      // portrait: 1 hoja (landscape cambia abajo)
-  flippingTime:1000
-  
-  
+let pageFlip = null;
 
-});
-pageFlip.loadFromHTML(domPages);
+// Crea (o recrea) PageFlip con tamaño exacto
+function createFlipbook(opts, goToIndex) {
+  // conserva página actual si ya existe
+  let current = 0;
+  if (pageFlip && typeof pageFlip.getCurrentPageIndex === 'function') {
+    try { current = pageFlip.getCurrentPageIndex(); } catch(e){}
+  }
+  if (typeof goToIndex === 'number') current = goToIndex;
 
-/* ===== Ajuste por orientación: 1 hoja en portrait / 2 en landscape ===== */
-(function fitByOrientation(){
-  const PF = pageFlip;
-  const R  = root;
-
-  function fit(){
-    // Tamaño actual del contenedor que YA tienes con tu CSS
-    const cw = R.clientWidth;
-    const ch = R.clientHeight;
-
-    // Detecta orientación
-    const isPortrait = ch >= cw;
-
-    // OJO: en PageFlip `width` es el ANCHO **DE UNA SOLA PÁGINA**
-    const pageW = isPortrait ? cw : Math.floor(cw / 2);
-    const pageH = ch;
-
-    PF.setOptions({
-      width: pageW,
-      height: pageH,
-      usePortrait: isPortrait  // portrait => 1 hoja; landscape => 2 hojas
-    });
-    PF.update();
+  // destruye instancia anterior
+  if (pageFlip && typeof pageFlip.destroy === 'function') {
+    try { pageFlip.destroy(); } catch(e){}
   }
 
-  // Debounce + doble pase para cuando las barras del navegador terminan de animarse
-  let tid;
-  const ask = () => {
-    clearTimeout(tid);
-    tid = setTimeout(() => { fit(); setTimeout(fit, 180); }, 60);
-  };
-
-  window.addEventListener('resize', ask, {passive:true});
-  window.addEventListener('orientationchange', ask, {passive:true});
-  document.addEventListener('visibilitychange', ask);
-  fit(); // primera medida
-})();
-
-function fit(){
-  // Viewport real (evita cortes por barras del navegador)
-  const vw = Math.max(1, window.innerWidth  || document.documentElement.clientWidth  || 0);
-  const vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 0);
-
-  // ¿Portrait (1 hoja) o landscape (2 hojas)?
-  const isPortrait = vh >= vw;
-
-  // Dimensiones de UNA página
-  const pageW = isPortrait ? vw : Math.floor(vw / 2);
-  const pageH = vh;
-
-  // Ajusta el contenedor (coincidir con viewport)
-  root.style.width  = vw + 'px';
-  root.style.height = vh + 'px';
-
-  // Aplica a PageFlip y refresca
-  pageFlip.setOptions({
+  // crea nueva instancia con las medidas solicitadas
+  pageFlip = new St.PageFlip(root, Object.assign({
     size: 'fixed',
-    width: pageW,
-    height: pageH,
-    usePortrait: isPortrait
-  });
-  pageFlip.update();
+    showCover: true,
+    usePortrait: true,
+    flippingTime: 1000,
+    mobileScrollSupport: true         // ← importante para tacto en móvil
+  }, opts));
+
+  pageFlip.loadFromHTML(domPages);
+
+  // vuelve a la página en la que estaba
+  if (typeof current === 'number') {
+    try { pageFlip.turnToPage(current); } catch(e){}
+  }
 }
 
-// Recalcular en cambios de tamaño/orientación (debounce)
-let _tid;
-const requestFit = ()=>{ clearTimeout(_tid); _tid = setTimeout(fit, 60); };
-window.addEventListener('resize', requestFit, {passive:true});
-window.addEventListener('orientationchange', requestFit, {passive:true});
-window.addEventListener('visibilitychange', requestFit);
-fit();
+// Calcula medidas y recrea si cambian
+function fit() {
+  // Viewport “real”
+  const vw = Math.max(document.documentElement.clientWidth,  window.innerWidth  || 0);
+  const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 
+  // En móvil, el contenedor ocupa el viewport
+  if (vw <= 900) {
+    root.style.width  = vw + 'px';
+    root.style.height = vh + 'px';
+  }
+
+  const isPortrait = vh >= vw;
+
+  // OJO: width es el ANCHO **DE UNA SOLA PÁGINA**
+  const pageW = isPortrait ? root.clientWidth : Math.floor(root.clientWidth / 2);
+  const pageH = root.clientHeight;
+
+  // Si no hay instancia aún → crea; si hay y cambió el tamaño → recrea
+  const needNew =
+    !pageFlip ||
+    pageFlip.getSettings?.().width  !== pageW ||
+    pageFlip.getSettings?.().height !== pageH ||
+    pageFlip.getSettings?.().usePortrait !== isPortrait;
+
+  if (needNew) {
+    createFlipbook({ width: pageW, height: pageH, usePortrait: isPortrait });
+  } else {
+    // ajuste fino
+    try { pageFlip.update(); } catch(e){}
+  }
+}
+
+// Debounce + segundo pase (por barras del navegador)
+let tid;
+function requestFit() {
+  clearTimeout(tid);
+  tid = setTimeout(() => { fit(); setTimeout(fit, 180); }, 60);
+}
+
+window.addEventListener('resize', requestFit, { passive: true });
+window.addEventListener('orientationchange', requestFit, { passive: true });
+document.addEventListener('visibilitychange', requestFit);
+
+// Primera medida
+fit();
 /* ===========================
    NUMERACIÓN
 =========================== */
@@ -402,7 +397,49 @@ book.querySelectorAll('.page').forEach((p,i)=> p.dataset.pageno=i+1);
     if (!document.body.classList.contains('lb-open')) return;
     if (e.key === 'Escape') { e.preventDefault(); closeLB(); }
   }, true);
+
 })();
+
+/* ===== Guard de interacciones (prioridad sobre el gesto de pasar página) ===== */
+document.addEventListener('pointerdown', (ev) => {
+  // a) Imagen → Lightbox
+  const card = ev.target.closest('.img-card');
+  if (card) {
+    const img = card.querySelector('img');
+    if (img) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      // reutiliza el lightbox creado por tu setupLightbox()
+      const lb = document.querySelector('.lightbox');
+      const lbImg = lb?.querySelector('.lb-img');
+      if (lb && lbImg) {
+        lbImg.src = img.currentSrc || img.src;
+        lb.classList.add('open');
+        document.body.classList.add('lb-open');
+      }
+    }
+    return;
+  }
+
+  // b) Home → Índice
+  const goHome = ev.target.closest('.js-go-index,.fab-home');
+  if (goHome) {
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    pageFlip?.turnToPage(INDEX_PAGE);
+    return;
+  }
+
+  // c) Índice → Categoría
+  const row = ev.target.closest('.index .row');
+  if (row) {
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
+    const idx = firstIndexByCat[row.dataset.goto];
+    if (typeof idx === 'number') pageFlip?.turnToPage(idx);
+  }
+}, true); // CAPTURE: corre antes que PageFlip
+
 
 /* ===========================
    BLOQUEAR GESTOS EN ZOOM

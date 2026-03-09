@@ -301,3 +301,18 @@ html,body{
   z-index: 999999 !important;
   pointer-events: auto !important;
 }
+
+/* Deja pasar los taps al contenido del libro (PageFlip añade capas propias) */
+.stf__block { pointer-events: none; }
+.stf__block .page,
+.stf__block .cat-page,
+.stf__block .index,
+.stf__block a,
+.stf__block img,
+.stf__book * { pointer-events: auto; }
+
+/* Home siempre visible y clicable encima de todo */
+#book .page .fab-home{
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+}
