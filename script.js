@@ -80,21 +80,33 @@ const pageDom=(density='soft')=>{
 };
 
 /* ===========================
-   GRID (FALLBACK RUTAS)
+   GRID (Optimizado: THUMBS en grid + FULL en data-full)
 =========================== */
 const gridDom = (images, cls)=>{
   const wrap = E('div',{class:cls});
   images.forEach(raw=>{
-    const a   = E('a',{href:'#',class:'img-card js-lightbox'});
-    const img = E('img',{loading:'lazy',src:encodeURI(raw),alt:''});
+    // Deriva rutas WebP (thumb y full) manteniendo subcarpetas
+    const parts = raw.split('/');
+    const file  = parts.pop(); // ej: manteleria1.jpeg
+    const dir   = parts.join('/'); // ej: images/Manteleria
+    const base  = file.replace(/\.(jpe?g|png)$/i,'');
+    const sub   = dir.replace(/^images\//,''); // ej: Manteleria
 
-    img.onerror=()=>{
-      let fix = raw;
-      if(fix.includes('Mesa_De_Dulces')) fix = fix.replace('Mesa_De_Dulces','MesaDeDulces');
-      if(/\.jpeg$/i.test(fix)) fix = fix.replace(/\.jpeg$/i,'.jpg');
-      else if(/\.jpg$/i.test(fix)) fix = fix.replace(/\.jpg$/i,'.jpeg');
-      if(fix.includes(' ')) fix = fix.replace(/ /g,'%20');
-      img.src = encodeURI(fix);
+    const thumb = `images/thumbs/${sub}/${base}.webp`;
+    const full  = `images/webp/${sub}/${base}.webp`;
+
+    const a   = E('a',{href:'#',class:'img-card js-lightbox','data-full': full});
+    const img = E('img',{
+      loading:'lazy',
+      decoding:'async',
+      src: encodeURI(thumb),
+      alt:''
+    });
+
+    // Fallback de red si aún no existen thumbs
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = encodeURI(raw);
     };
 
     a.appendChild(img);
@@ -203,7 +215,6 @@ function addCategory(title,key,imgs){
   });
 }
 
-// Crea TODAS las categorías
 for (const k of CATEGORIES){
   addCategory(
     k.replace(/([A-Z])/g,' $1').replace(/^ /,'').replace('De ','de '),
@@ -216,9 +227,7 @@ for (const k of CATEGORIES){
 {
   const p = pageDom();
   p.dataset.cat = 'Ubicacion';
-  if (typeof firstIndexByCat === 'object') {
-    firstIndexByCat['Ubicacion'] = pages.length;
-  }
+  firstIndexByCat['Ubicacion'] = pages.length;
 
   const mapsUrl = 'https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju%C3%A9rez,+M%C3%A9x.,+M%C3%A9xico/@19.3700759,-99.7664634,17z/data=!3m1!4b1!4m6!3m5!1s0x85d279a6c6dc32ef:0x88e46e428e82e6ff!8m2!3d19.3700759!4d-99.7638831!16s%2Fg%2F11hbqks6x6?entry=ttu';
 
@@ -236,30 +245,12 @@ for (const k of CATEGORIES){
       E('p', { class: 'qr-note' }, 'Toca el código QR para abrir Google Maps')
     ),
     E('div', { class: 'links' },
-      E('a', {
-          class: 'social',
-          href: 'https://wa.me/527226307655?text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n',
-          target: '_blank', rel: 'noopener'
-        },
-        E('img', { src: 'assets/WHATS.jpg', alt: 'WhatsApp' }),
-        E('span', {}, 'WhatsApp: 722 630 7655')
-      ),
-      E('a', {
-          class: 'social',
-          href: 'https://www.instagram.com/pigosalquiler/',
-          target: '_blank', rel: 'noopener'
-        },
-        E('img', { src: 'assets/INSTA.jpg', alt: 'Instagram' }),
-        E('span', {}, '@pigosalquiler')
-      ),
-      E('a', {
-          class: 'social',
-          href: 'https://www.facebook.com/share/1DDrS8JTB6/?mibextid=wwXIfr',
-          target: '_blank', rel: 'noopener'
-        },
-        E('img', { src: 'assets/FACE.jpg', alt: 'Facebook' }),
-        E('span', {}, 'Facebook')
-      )
+      E('a', { class: 'social', href: 'https://wa.me/527226307655?text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n', target: '_blank', rel: 'noopener' },
+        E('img', { src: 'assets/WHATS.jpg', alt: 'WhatsApp' }), E('span', {}, 'WhatsApp: 722 630 7655')),
+      E('a', { class: 'social', href: 'https://www.instagram.com/pigosalquiler/', target: '_blank', rel: 'noopener' },
+        E('img', { src: 'assets/INSTA.jpg', alt: 'Instagram' }), E('span', {}, '@pigosalquiler')),
+      E('a', { class: 'social', href: 'https://www.facebook.com/share/1DDrS8JTB6/?mibextid=wwXIfr', target: '_blank', rel: 'noopener' },
+        E('img', { src: 'assets/FACE.jpg', alt: 'Facebook' }), E('span', {}, 'Facebook'))
     )
   );
 
@@ -268,92 +259,23 @@ for (const k of CATEGORIES){
 }
 
 /* ===========================
-   INIT FLIPBOOK (compatible con tu versión sin setOptions)
+   INIT FLIPBOOK (original + mobileScrollSupport)
 =========================== */
-pages.forEach(pg => book.appendChild(pg));
+pages.forEach(pg=>book.appendChild(pg));
 
-// NodeList que usa PageFlip
 const domPages = Array.from(book.querySelectorAll('.page'));
 
-let pageFlip = null;
+const pageFlip=new St.PageFlip(root,{
+  size:'fixed',
+  width:Math.floor(root.clientWidth/2),
+  height:root.clientHeight,
+  showCover:true,
+  usePortrait:true,
+  flippingTime:1000,
+  mobileScrollSupport:true
+});
+pageFlip.loadFromHTML(domPages);
 
-// Crea (o recrea) PageFlip con tamaño exacto
-function createFlipbook(opts, goToIndex) {
-  // conserva página actual si ya existe
-  let current = 0;
-  if (pageFlip && typeof pageFlip.getCurrentPageIndex === 'function') {
-    try { current = pageFlip.getCurrentPageIndex(); } catch(e){}
-  }
-  if (typeof goToIndex === 'number') current = goToIndex;
-
-  // destruye instancia anterior
-  if (pageFlip && typeof pageFlip.destroy === 'function') {
-    try { pageFlip.destroy(); } catch(e){}
-  }
-
-  // crea nueva instancia con las medidas solicitadas
-  pageFlip = new St.PageFlip(root, Object.assign({
-    size: 'fixed',
-    showCover: true,
-    usePortrait: true,
-    flippingTime: 1000,
-    mobileScrollSupport: true         // ← importante para tacto en móvil
-  }, opts));
-
-  pageFlip.loadFromHTML(domPages);
-
-  // vuelve a la página en la que estaba
-  if (typeof current === 'number') {
-    try { pageFlip.turnToPage(current); } catch(e){}
-  }
-}
-
-// Calcula medidas y recrea si cambian
-function fit() {
-  // Viewport “real”
-  const vw = Math.max(document.documentElement.clientWidth,  window.innerWidth  || 0);
-  const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-
-  // En móvil, el contenedor ocupa el viewport
-  if (vw <= 900) {
-    root.style.width  = vw + 'px';
-    root.style.height = vh + 'px';
-  }
-
-  const isPortrait = vh >= vw;
-
-  // OJO: width es el ANCHO **DE UNA SOLA PÁGINA**
-  const pageW = isPortrait ? root.clientWidth : Math.floor(root.clientWidth / 2);
-  const pageH = root.clientHeight;
-
-  // Si no hay instancia aún → crea; si hay y cambió el tamaño → recrea
-  const needNew =
-    !pageFlip ||
-    pageFlip.getSettings?.().width  !== pageW ||
-    pageFlip.getSettings?.().height !== pageH ||
-    pageFlip.getSettings?.().usePortrait !== isPortrait;
-
-  if (needNew) {
-    createFlipbook({ width: pageW, height: pageH, usePortrait: isPortrait });
-  } else {
-    // ajuste fino
-    try { pageFlip.update(); } catch(e){}
-  }
-}
-
-// Debounce + segundo pase (por barras del navegador)
-let tid;
-function requestFit() {
-  clearTimeout(tid);
-  tid = setTimeout(() => { fit(); setTimeout(fit, 180); }, 60);
-}
-
-window.addEventListener('resize', requestFit, { passive: true });
-window.addEventListener('orientationchange', requestFit, { passive: true });
-document.addEventListener('visibilitychange', requestFit);
-
-// Primera medida
-fit();
 /* ===========================
    NUMERACIÓN
 =========================== */
@@ -380,7 +302,8 @@ book.querySelectorAll('.page').forEach((p,i)=> p.dataset.pageno=i+1);
     ev.preventDefault(); ev.stopImmediatePropagation();
     const img = card.querySelector('img');
     if (!img) return;
-    lbImg.src = img.currentSrc || img.src;
+    const full = card.getAttribute('data-full'); // << usa FULL si existe
+    lbImg.src = full || img.currentSrc || img.src;
     lb.classList.add('open');
     document.body.classList.add('lb-open');
   }
@@ -397,49 +320,7 @@ book.querySelectorAll('.page').forEach((p,i)=> p.dataset.pageno=i+1);
     if (!document.body.classList.contains('lb-open')) return;
     if (e.key === 'Escape') { e.preventDefault(); closeLB(); }
   }, true);
-
 })();
-
-/* ===== Guard de interacciones (prioridad sobre el gesto de pasar página) ===== */
-document.addEventListener('pointerdown', (ev) => {
-  // a) Imagen → Lightbox
-  const card = ev.target.closest('.img-card');
-  if (card) {
-    const img = card.querySelector('img');
-    if (img) {
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      // reutiliza el lightbox creado por tu setupLightbox()
-      const lb = document.querySelector('.lightbox');
-      const lbImg = lb?.querySelector('.lb-img');
-      if (lb && lbImg) {
-        lbImg.src = img.currentSrc || img.src;
-        lb.classList.add('open');
-        document.body.classList.add('lb-open');
-      }
-    }
-    return;
-  }
-
-  // b) Home → Índice
-  const goHome = ev.target.closest('.js-go-index,.fab-home');
-  if (goHome) {
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-    pageFlip?.turnToPage(INDEX_PAGE);
-    return;
-  }
-
-  // c) Índice → Categoría
-  const row = ev.target.closest('.index .row');
-  if (row) {
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-    const idx = firstIndexByCat[row.dataset.goto];
-    if (typeof idx === 'number') pageFlip?.turnToPage(idx);
-  }
-}, true); // CAPTURE: corre antes que PageFlip
-
 
 /* ===========================
    BLOQUEAR GESTOS EN ZOOM
@@ -474,65 +355,14 @@ document.addEventListener('pointerdown', (ev)=>{
   ev.preventDefault();
   ev.stopImmediatePropagation();
 
-  const key = row.dataset.goto;
+  const key = row.dataset.goto;                 // ej. "MesaDeDulces"
   const idx = firstIndexByCat[key];
 
   if (typeof idx !== 'number') {
     console.warn('[ÍNDICE] clave sin índice calculado:', key, firstIndexByCat);
     return;
   }
-  pageFlip.turnToPage(idx);
+  pageFlip.turnToPage(idx);                     // 0‑based real
 }, true);
-
-/* ===== Guard de interacciones: gana al gesto de pasar página ===== */
-(function priorityInteractions(){
-  // Escucha en CAPTURE para adelantarse a PageFlip
-  document.addEventListener('pointerdown', (ev) => {
-    // a) Imagen → Lightbox (abre y NO gira página)
-    const card = ev.target.closest('.img-card');
-    if (card) {
-      const img = card.querySelector('img');
-      if (img) {
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
-        // Reusa el lightbox existente si ya está creado
-        let lb = document.querySelector('.lightbox');
-        if (!lb) {
-          lb = document.createElement('div');
-          lb.className = 'lightbox';
-          lb.innerHTML = `
-            <button class="lb-close" type="button" aria-label="Regresar">Regresar</button>
-            <img class="lb-img" alt="">
-          `;
-          document.body.appendChild(lb);
-        }
-        const lbImg = lb.querySelector('.lb-img');
-        lbImg.src = img.currentSrc || img.src;
-        lb.classList.add('open');
-        document.body.classList.add('lb-open');
-      }
-      return;
-    }
-
-    // b) Home → Índice
-    const goHome = ev.target.closest('.js-go-index,.fab-home');
-    if (goHome) {
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      pageFlip.turnToPage(INDEX_PAGE);
-      return;
-    }
-
-    // c) Índice → Categoría
-    const row = ev.target.closest('.index .row');
-    if (row) {
-      ev.preventDefault();
-      ev.stopImmediatePropagation();
-      const idx = firstIndexByCat[row.dataset.goto];
-      if (typeof idx === 'number') pageFlip.turnToPage(idx);
-      return;
-    }
-  }, true); // << capture
-})();
 
 }); // FIN DOMContentLoaded

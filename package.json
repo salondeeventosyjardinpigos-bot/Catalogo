@@ -1,0 +1,15 @@
+{
+  "name": "pigos-catalogo",
+  "private": true,
+  "devDependencies": {
+    "@squoosh/cli": "^0.7.3",
+    "esbuild": "^0.19.12"
+  },
+  "scripts": {
+    "imgs:full": "bash -lc 'mkdir -p images/webp; for SRC in $(find images -type f \\\n -iregex '.*\\.(jpg|jpeg|png)'); do REL=${SRC#images/}; DIR=$(dirname \"$REL\"); \\\n mkdir -p \"images/webp/$DIR\"; npx @squoosh/cli --webp auto --resize \"{\\\"width\\\":1600}\" --output-dir \"images/webp/$DIR\" \"$SRC\"; done'",
+    "imgs:thumbs": "bash -lc 'mkdir -p images/thumbs; for SRC in $(find images -type f \\\n -iregex '.*\\.(jpg|jpeg|png)'); do REL=${SRC#images/}; DIR=$(dirname \"$REL\"); \\\n mkdir -p \"images/thumbs/$DIR\"; npx @squoosh/cli --webp auto --resize \"{\\\"width\\\":900}\" --output-dir \"images/thumbs/$DIR\" \"$SRC\"; done'",
+    "build:js": "npx esbuild script.js --minify --outfile=script.min.js && cp script.min.js script.js",
+    "build:css": "npx esbuild styles.css --minify --outfile=styles.min.css && cp styles.min.css styles.css",
+    "build": "npm run imgs:full && npm run imgs:thumbs && npm run build:js && npm run build:css"
+  }
+}

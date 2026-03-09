@@ -1,0 +1,64 @@
+name: Optimize assets
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Generate WEBP FULL (1600px) preserving subfolders
+        shell: bash
+        run: |
+          mkdir -p images/webp
+          shopt -s globstar
+          for SRC in images/**/*.{jpg,jpeg,png}; do
+            [ -f "$SRC" ] || continue
+            REL=${SRC#images/}
+            DIR=$(dirname "$REL")
+            mkdir -p "images/webp/$DIR"
+            npx @squoosh/cli --webp auto --resize '{"width":1600}' --output-dir "images/webp/$DIR" "$SRC"
+          done
+
+      - name: Generate WEBP THUMBS (900px) preserving subfolders
+        shell: bash
+        run: |
+          mkdir -p images/thumbs
+          shopt -s globstar
+          for SRC in images/**/*.{jpg,jpeg,png}; do
+            [ -f "$SRC" ] || continue
+            REL=${SRC#images/}
+            DIR=$(dirname "$REL")
+            mkdir -p "images/thumbs/$DIR"
+            npx @squoosh/cli --webp auto --resize '{"width":900}' --output-dir "images/thumbs/$DIR" "$SRC"
+          done
+
+      - name: Minify JS/CSS (overwrite originals)
+        run: |
+          npx esbuild script.js --minify --outfile=script.min.js
+          npx esbuild styles.css --minify --outfile=styles.min.css
+          cp script.min.js script.js || true
+          cp styles.min.css styles.css || true
+
+      - name: Commit optimized assets
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: optimize images (webp/thumbs) and minify assets" || echo "No changes"
+          git push
