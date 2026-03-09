@@ -11,54 +11,66 @@ permissions:
 jobs:
   build-optimize:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      - name: Install WebP tools (cwebp, img2webp) and Node
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp
+      - name: Install esbuild (minifier)
+        run: |
+          npm i -g esbuild
 
-      - name: Install deps
-        run: npm ci || npm i
-
+      # FULL WEBP (≈1600 px lado mayor) manteniendo subcarpetas
       - name: Generate WEBP FULL (1600px) preserving subfolders
         shell: bash
         run: |
-          mkdir -p images/webp
           shopt -s globstar
-          for SRC in images/**/*.{jpg,jpeg,png}; do
+          set -e
+          mkdir -p images/webp
+          for SRC in images/**/*.{jpg,jpeg,png,JPG,JPEG,PNG}; do
             [ -f "$SRC" ] || continue
-            REL=${SRC#images/}
-            DIR=$(dirname "$REL")
+            REL="${SRC#images/}"                      # ej: Manteleria/manteleria1.jpeg
+            DIR="$(dirname "$REL")"                   # ej: Manteleria
+            BAS="$(basename "$REL")"
+            NAME="${BAS%.*}"                          # ej: manteleria1
             mkdir -p "images/webp/$DIR"
-            npx @squoosh/cli --webp auto --resize '{"width":1600}' --output-dir "images/webp/$DIR" "$SRC"
+            # Convierte a 1600px max manteniendo proporción. Calidad 82 (ajusta si quieres)
+            cwebp -q 82 -m 6 -mt -resize 1600 0 "$SRC" -o "images/webp/$DIR/$NAME.webp" >/dev/null 2>&1 || true
           done
 
+      # THUMBS WEBP (≈900 px lado mayor) manteniendo subcarpetas
       - name: Generate WEBP THUMBS (900px) preserving subfolders
         shell: bash
         run: |
-          mkdir -p images/thumbs
           shopt -s globstar
-          for SRC in images/**/*.{jpg,jpeg,png}; do
+          set -e
+          mkdir -p images/thumbs
+          for SRC in images/**/*.{jpg,jpeg,png,JPG,JPEG,PNG}; do
             [ -f "$SRC" ] || continue
-            REL=${SRC#images/}
-            DIR=$(dirname "$REL")
+            REL="${SRC#images/}"
+            DIR="$(dirname "$REL")"
+            BAS="$(basename "$REL")"
+            NAME="${BAS%.*}"
             mkdir -p "images/thumbs/$DIR"
-            npx @squoosh/cli --webp auto --resize '{"width":900}' --output-dir "images/thumbs/$DIR" "$SRC"
+            # Convierte a 900px max manteniendo proporción. Calidad 78 (ajusta si quieres)
+            cwebp -q 78 -m 6 -mt -resize 900 0 "$SRC" -o "images/thumbs/$DIR/$NAME.webp" >/dev/null 2>&1 || true
           done
 
+      # Minificar JS/CSS (sobrescribe para no cambiar rutas en index.html)
       - name: Minify JS/CSS (overwrite originals)
         run: |
-          npx esbuild script.js --minify --outfile=script.min.js
-          npx esbuild styles.css --minify --outfile=styles.min.css
-          cp script.min.js script.js || true
-          cp styles.min.css styles.css || true
+          [ -f script.js ] && esbuild script.js --minify --outfile=script.min.js && mv -f script.min.js script.js || true
+          [ -f styles.css ] && esbuild styles.css --minify --outfile=styles.min.css && mv -f styles.min.css styles.css || true
 
+      # Commit automático de los nuevos archivos optimizados
       - name: Commit optimized assets
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
           git add -A
-          git commit -m "chore: optimize images (webp/thumbs) and minify assets" || echo "No changes"
+          git commit -m "chore: optimize images with cwebp (full/thumbs) and minify" || echo "No changes"
           git push
