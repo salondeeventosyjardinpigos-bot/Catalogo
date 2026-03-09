@@ -133,7 +133,6 @@ const INDEX_PAGE = pages.length;
 
   const cols = E('div',{class:'cols'});
   CATEGORIES.forEach(c=>{
-    // ✅ CLAVE exacta en data-goto (no el texto bonito)
     const row = E('div',{class:'row',dataset:{goto:c}});
     row.appendChild(E('img',{src:'assets/bullet.png',alt:''}));
     const nice = c.replace(/([A-Z])/g,' $1').trim().replace('De ','de ');
@@ -169,10 +168,9 @@ function addCategory(title,key,imgs){
     const p   = pageDom();
     const cat = E('div',{class:'cat-page'});
 
-    // ✅ Marca la PRIMERA página real de la categoría y registra su índice 0-based
     if (groupIdx === 0) {
-      p.dataset.cat = key;                // (opcional, para inspección)
-      firstIndexByCat[key] = pages.length; // ← índice que tendrá al montarse
+      p.dataset.cat = key;
+      firstIndexByCat[key] = pages.length;
     }
 
     // Título
@@ -216,34 +214,27 @@ for (const k of CATEGORIES){
 
 /* ---- UBICACIÓN (página especial) ---- */
 {
-  // Marca y registra índice 0‑based para que el Índice pueda navegar aquí
   const p = pageDom();
   p.dataset.cat = 'Ubicacion';
   if (typeof firstIndexByCat === 'object') {
     firstIndexByCat['Ubicacion'] = pages.length;
   }
 
-  const mapsUrl = 'https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju%C3%A9rez,+M%C3%A9x.,+M%C3%A9xico/@19.3700759,-99.7664634,17z/data=!3m1!4b1!4m6!3m5!1s0x85d279a6c6dc32ef:0x88e46e428e82e6ff!8m2!3d19.3700759!4d-99.7638831!16s%2Fg%2F11hbqks6x6?entry=ttu&g_ep=EgoyMDI2MDIyNC4wIKXMDSoASAFQAw%3D%3D';
+  const mapsUrl = 'https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju%C3%A9rez,+M%C3%A9x.,+M%C3%A9xico/@19.3700759,-99.7664634,17z/data=!3m1!4b1!4m6!3m5!1s0x85d279a6c6dc32ef:0x88e46e428e82e6ff!8m2!3d19.3700759!4d-99.7638831!16s%2Fg%2F11hbqks6x6?entry=ttu';
 
   const section = E('section', { class: 'contact contact-ubicacion' },
-
-    // ⬇⬇ TÍTULO con el MISMO formato que el resto (logo + texto + línea dorada)
     E('div', { class: 'title-bar' },
       E('h2', { class: 'h2 title-with-logo' },
         E('img', { class: 'title-logo', src: 'assets/logo_circle.png', alt: '' }),
         E('span', { class: 'title-text' }, 'UBICACIÓN & CONTACTO')
       )
     ),
-
-    // Bloque QR (centrado y abajo). Al presionarlo → Google Maps
     E('div', { class: 'qr-block' },
       E('a', { href: mapsUrl, target: '_blank', rel: 'noopener' },
         E('img', { src: 'assets/ubi.jpeg', alt: 'Abrir en Google Maps' })
       ),
       E('p', { class: 'qr-note' }, 'Toca el código QR para abrir Google Maps')
     ),
-
-    // Links sociales (iconos más grandes y con destino)
     E('div', { class: 'links' },
       E('a', {
           class: 'social',
@@ -275,23 +266,57 @@ for (const k of CATEGORIES){
   p.appendChild(section);
   pages.push(p);
 }
+
 /* ===========================
-   INIT FLIPBOOK
+   INIT FLIPBOOK (ADAPTACIÓN MÓVIL SIN CAMBIAR LAYOUTS)
 =========================== */
 pages.forEach(pg=>book.appendChild(pg));
-
-// Mismo NodeList que verá PageFlip
 const domPages = Array.from(book.querySelectorAll('.page'));
 
+// Base 'fixed' (control exacto) – luego ajustamos medidas reales con fit()
 const pageFlip=new St.PageFlip(root,{
   size:'fixed',
-  width:Math.floor(root.clientWidth/2),
-  height:root.clientHeight,
+  width:400,             // placeholders; se corrigen en fit()
+  height:600,
   showCover:true,
-  usePortrait:true,
+  usePortrait:true,      // portrait: 1 hoja (landscape cambia abajo)
   flippingTime:1000
 });
 pageFlip.loadFromHTML(domPages);
+
+function fit(){
+  // Viewport real (evita cortes por barras del navegador)
+  const vw = Math.max(1, window.innerWidth  || document.documentElement.clientWidth  || 0);
+  const vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 0);
+
+  // ¿Portrait (1 hoja) o landscape (2 hojas)?
+  const isPortrait = vh >= vw;
+
+  // Dimensiones de UNA página
+  const pageW = isPortrait ? vw : Math.floor(vw / 2);
+  const pageH = vh;
+
+  // Ajusta el contenedor (coincidir con viewport)
+  root.style.width  = vw + 'px';
+  root.style.height = vh + 'px';
+
+  // Aplica a PageFlip y refresca
+  pageFlip.setOptions({
+    size: 'fixed',
+    width: pageW,
+    height: pageH,
+    usePortrait: isPortrait
+  });
+  pageFlip.update();
+}
+
+// Recalcular en cambios de tamaño/orientación (debounce)
+let _tid;
+const requestFit = ()=>{ clearTimeout(_tid); _tid = setTimeout(fit, 60); };
+window.addEventListener('resize', requestFit, {passive:true});
+window.addEventListener('orientationchange', requestFit, {passive:true});
+window.addEventListener('visibilitychange', requestFit);
+fit();
 
 /* ===========================
    NUMERACIÓN
@@ -364,8 +389,6 @@ document.addEventListener("click",(ev)=>{
 /* ===========================
    ÍNDICE → CATEGORÍA (DINÁMICO por mapa calculado)
 =========================== */
-// Usamos el índice calculado al construir (firstIndexByCat),
-// y ganamos al flipbook en pointerdown (capture).
 document.addEventListener('pointerdown', (ev)=>{
   const row = ev.target.closest('.index .row');
   if (!row) return;
@@ -373,14 +396,14 @@ document.addEventListener('pointerdown', (ev)=>{
   ev.preventDefault();
   ev.stopImmediatePropagation();
 
-  const key = row.dataset.goto;                 // ej. "MesaDeDulces"
+  const key = row.dataset.goto;
   const idx = firstIndexByCat[key];
 
   if (typeof idx !== 'number') {
     console.warn('[ÍNDICE] clave sin índice calculado:', key, firstIndexByCat);
     return;
   }
-  pageFlip.turnToPage(idx);                     // 0‑based real
+  pageFlip.turnToPage(idx);
 }, true);
 
 }); // FIN DOMContentLoaded
