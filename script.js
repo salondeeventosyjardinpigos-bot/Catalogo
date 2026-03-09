@@ -281,44 +281,47 @@ const pageFlip=new St.PageFlip(root,{
   showCover:true,
   usePortrait:true,      // portrait: 1 hoja (landscape cambia abajo)
   flippingTime:1000
+  
+  
+
 });
 pageFlip.loadFromHTML(domPages);
 
-/* ====== Ajuste simple de tamaño para móvil (portrait / landscape) ====== */
-(function fitFlipbook(){
+/* ===== Ajuste por orientación: 1 hoja en portrait / 2 en landscape ===== */
+(function fitByOrientation(){
   const PF = pageFlip;
   const R  = root;
 
   function fit(){
-    // Medidas actuales del viewport
-    const vw = Math.max(document.documentElement.clientWidth,  window.innerWidth  || 0);
-    const vh = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    // Tamaño actual del contenedor que YA tienes con tu CSS
+    const cw = R.clientWidth;
+    const ch = R.clientHeight;
 
-    // En móvil hacemos que el contenedor coincida con el viewport
-    if (vw <= 900){
-      R.style.width  = vw + 'px';
-      R.style.height = vh + 'px';
-    }
+    // Detecta orientación
+    const isPortrait = ch >= cw;
 
-    // Orientación: portrait = 1 hoja; landscape = 2 hojas
-    const isPortrait = vh >= vw;
+    // OJO: en PageFlip `width` es el ANCHO **DE UNA SOLA PÁGINA**
+    const pageW = isPortrait ? cw : Math.floor(cw / 2);
+    const pageH = ch;
 
-    // OJO: en PageFlip `width` es ANCHO **DE UNA PÁGINA**
-    const pageW = isPortrait ? R.clientWidth : Math.floor(R.clientWidth / 2);
-    const pageH = R.clientHeight;
-
-    PF.setOptions({ width: pageW, height: pageH, usePortrait: isPortrait });
+    PF.setOptions({
+      width: pageW,
+      height: pageH,
+      usePortrait: isPortrait  // portrait => 1 hoja; landscape => 2 hojas
+    });
     PF.update();
   }
 
-  // Debounce ligero + listeners de tamaño/orientación
+  // Debounce + doble pase para cuando las barras del navegador terminan de animarse
   let tid;
-  const ask = () => { clearTimeout(tid); tid = setTimeout(fit, 60); };
+  const ask = () => {
+    clearTimeout(tid);
+    tid = setTimeout(() => { fit(); setTimeout(fit, 180); }, 60);
+  };
 
   window.addEventListener('resize', ask, {passive:true});
   window.addEventListener('orientationchange', ask, {passive:true});
   document.addEventListener('visibilitychange', ask);
-
   fit(); // primera medida
 })();
 
@@ -443,5 +446,56 @@ document.addEventListener('pointerdown', (ev)=>{
   }
   pageFlip.turnToPage(idx);
 }, true);
+
+/* ===== Guard de interacciones: gana al gesto de pasar página ===== */
+(function priorityInteractions(){
+  // Escucha en CAPTURE para adelantarse a PageFlip
+  document.addEventListener('pointerdown', (ev) => {
+    // a) Imagen → Lightbox (abre y NO gira página)
+    const card = ev.target.closest('.img-card');
+    if (card) {
+      const img = card.querySelector('img');
+      if (img) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        // Reusa el lightbox existente si ya está creado
+        let lb = document.querySelector('.lightbox');
+        if (!lb) {
+          lb = document.createElement('div');
+          lb.className = 'lightbox';
+          lb.innerHTML = `
+            <button class="lb-close" type="button" aria-label="Regresar">Regresar</button>
+            <img class="lb-img" alt="">
+          `;
+          document.body.appendChild(lb);
+        }
+        const lbImg = lb.querySelector('.lb-img');
+        lbImg.src = img.currentSrc || img.src;
+        lb.classList.add('open');
+        document.body.classList.add('lb-open');
+      }
+      return;
+    }
+
+    // b) Home → Índice
+    const goHome = ev.target.closest('.js-go-index,.fab-home');
+    if (goHome) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      pageFlip.turnToPage(INDEX_PAGE);
+      return;
+    }
+
+    // c) Índice → Categoría
+    const row = ev.target.closest('.index .row');
+    if (row) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      const idx = firstIndexByCat[row.dataset.goto];
+      if (typeof idx === 'number') pageFlip.turnToPage(idx);
+      return;
+    }
+  }, true); // << capture
+})();
 
 }); // FIN DOMContentLoaded

@@ -295,3 +295,9 @@ html,body{
     overflow:hidden;
   }
 }
+
+/* Home por encima de todo y clicable */
+#book .page .fab-home{
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+}
