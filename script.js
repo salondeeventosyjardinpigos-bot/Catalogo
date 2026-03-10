@@ -1,4 +1,113 @@
-"use strict";document.addEventListener("DOMContentLoaded",()=>{console.log("[INIT] DOMContentLoaded");const y=document.querySelector(".flipbook-root"),g=document.getElementById("book");if(!y||!g){console.error("\u274C Falta .flipbook-root o #book en el HTML");return}if(!window.St||!St.PageFlip){console.error("\u274C No carg\xF3 PageFlip (revisa el NOMBRE del archivo de la librer\xEDa y el orden en index.html)");return}const v=["Manteleria","PastoSintetico","Carpas","Charcuteria","Desayunos","Mobiliario","Tapes","Cafe","Jardin","Salon","MesaDeDulces","Salas","PlatosBase","Copas","PistaLED","Inflables","Sillones","MesaDeNovios","Letras","Ubicacion"],D={PastoSintetico:["images/PastoSintetico/pasto1.jpeg","images/PastoSintetico/pasto2.jpeg","images/PastoSintetico/pasto3.jpeg"],Manteleria:Array.from({length:18},(e,t)=>`images/Manteleria/manteleria${t+1}.jpeg`),Carpas:Array.from({length:16},(e,t)=>`images/Carpas/Carpas${t+1}.jpeg`),Charcuteria:Array.from({length:18},(e,t)=>`images/Charcuteria/Charcuteria${t+1}.jpeg`),Desayunos:Array.from({length:10},(e,t)=>`images/Desayunos/Desayunos${t+1}.jpeg`),Mobiliario:Array.from({length:20},(e,t)=>`images/Mobiliario/Mobiliario${t+1}.jpeg`),Tapes:["images/Tapes/tape1.jpeg"],Cafe:Array.from({length:5},(e,t)=>`images/Cafe/Cafe${t+1}.jpeg`),Jardin:["images/Jardin/Jardin1.jpeg","images/Jardin/Jardin2.jpeg","images/Jardin/Jardin3.jpeg"],Salon:["images/Salon/Salon1.jpeg","images/Salon/salon2.jpeg","images/Salon/salon3.jpeg"],MesaDeDulces:Array.from({length:7},(e,t)=>`images/MesaDeDulces/MesadeDulces${t+1}.jpeg`),Salas:["images/Salas/sala1.jpeg","images/Salas/sala2.jpeg"],PlatosBase:["images/PlatosBase/platobase1.jpeg","images/PlatosBase/platobase2.jpeg","images/PlatosBase/platobase3.jpeg","images/PlatosBase/platobase4.jpeg","images/PlatosBase/platobase5.jpeg"],Copas:Array.from({length:5},(e,t)=>`images/Copas/copa${t+1}.jpeg`),PistaLED:["images/PistaLED/pistas led.jpeg"],Inflables:["images/Inflables/inflables.jpeg"],Sillones:["images/Sillones/sillones.jpeg"],MesaDeNovios:["images/MesaDeNovios/mesa de novios.jpeg"],Letras:["images/Letras/Letras.jpeg"],Ubicacion:[]},a=(e,t={},...o)=>{const s=document.createElement(e);for(const[i,l]of Object.entries(t))i==="class"?s.className=l:i==="dataset"?Object.assign(s.dataset,l):s.setAttribute(i,l);return o.flat().forEach(i=>{typeof i=="string"?s.appendChild(document.createTextNode(i)):i&&s.appendChild(i)}),s},E=(e,t)=>{const o=[];for(let s=0;s<e.length;s+=t)o.push(e.slice(s,s+t));return o},u=(e="soft")=>{const t=a("div",{class:"page"});return t.dataset.density=e,t},S=(e,t)=>{const o=a("div",{class:t});return e.forEach(s=>{const i=a("a",{href:"#",class:"img-card js-lightbox"}),l=a("img",{loading:"lazy",src:encodeURI(s),alt:""});l.onerror=()=>{let n=s;n.includes("Mesa_De_Dulces")&&(n=n.replace("Mesa_De_Dulces","MesaDeDulces")),/\.jpeg$/i.test(n)?n=n.replace(/\.jpeg$/i,".jpg"):/\.jpg$/i.test(n)&&(n=n.replace(/\.jpg$/i,".jpeg")),n.includes(" ")&&(n=n.replace(/ /g,"%20")),l.src=encodeURI(n)},i.appendChild(l),o.appendChild(i)}),o},c=[],p=Object.create(null);{const e=u("hard");e.appendChild(a("section",{class:"cover-custom"},a("div",{class:"left-side"},a("div",{class:"marble"})),a("div",{class:"right-side"},a("h1",{class:"title-cover"},"NUESTROS",a("br"),"PRODUCTOS",a("br"),"PIGO\xB4S"),a("div",{class:"author"},"Jos\xE9 Antonio G\xF3mez Dom\xEDnguez"),a("div",{class:"phone"},"7226307655")))),c.push(e)}const C=c.length;{const e=u("hard"),t=a("div",{class:"cols"});v.forEach(o=>{const s=a("div",{class:"row",dataset:{goto:o}});s.appendChild(a("img",{src:"assets/bullet.png",alt:""})),s.appendChild(a("span",{},o.replace(/([A-Z])/g," $1").trim().replace("De ","de "))),t.appendChild(s)}),e.appendChild(a("section",{class:"index"},a("div",{class:"bg"}),a("div",{class:"wrap"},a("h1",{class:"title"},"\xCDNDICE"),t))),c.push(e)}function L(e,t,o){if(!o?.length)return;E(o,6).forEach((i,l)=>{const n=i.length,m=n===1?"layout-1-hero":n===2?"layout-2-split":n===3?"layout-3-split":n===4?"layout-4-2x2":"layout-6-hero-3-2",d=u(),b=a("div",{class:"cat-page"});l===0&&(d.dataset.cat=t,p[t]=c.length),b.appendChild(a("div",{class:"title-bar"},a("h2",{class:"h2 title-with-logo"},a("img",{class:"title-logo",src:"assets/logo_circle.png",alt:""}),a("span",{class:"title-text"},e)))),b.appendChild(S(i,m)),d.appendChild(b),d.appendChild(a("a",{href:"#",class:"fab-home js-go-index","aria-label":"Regresar al \xEDndice"},(()=>{const j=a("svg",{viewBox:"0 0 24 24",width:"22",height:"22"});return j.appendChild(a("path",{fill:"currentColor",d:"M10.707 2.293a1 1 0 0 1 1.414 0l9 9a1 1 0 1 1-1.414 1.414L20 12.414V20a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5H11v5a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2v-7.586l-.707.707A1 1 0 0 1 1.879 11.293l9-9Z"})),j})())),c.push(d)})}v.forEach(e=>{L(e.replace(/([A-Z])/g," $1").replace(/^ /,"").replace("De ","de "),e,D[e])});{const e=u();e.dataset.cat="Ubicacion",p.Ubicacion=c.length,e.appendChild(a("section",{class:"contact contact-ubicacion"},a("div",{class:"title-bar"},a("h2",{class:"h2 title-with-logo"},a("img",{class:"title-logo",src:"assets/logo_circle.png",alt:""}),a("span",{class:"title-text"},"UBICACI\xD3N & CONTACTO"))),a("div",{class:"qr-block"},a("a",{href:"https://www.google.com/maps/place/Av.+Miguel+Hidalgo+26,+Centro,+50900+Villa+de+Almoloya+de+Ju\xE1rez",target:"_blank",rel:"noopener"},a("img",{src:"assets/ubi.jpeg",alt:"Abrir en Google Maps"})),a("p",{class:"qr-note"},"Toca el c\xF3digo QR para abrir Google Maps")))),c.push(e)}c.forEach(e=>g.appendChild(e));const P=Array.from(g.querySelectorAll(".page"));let r=null;function M(){const e=Math.max(1,window.innerWidth||document.documentElement.clientWidth||0),t=Math.max(1,window.innerHeight||document.documentElement.clientHeight||0);return{vw:e,vh:t}}function I(e,t,o){if(r&&typeof r.destroy=="function")try{r.destroy()}catch{}r=new St.PageFlip(y,{size:"fixed",width:e,height:t,showCover:!0,usePortrait:o,mobileScrollSupport:!0,flippingTime:900,drawShadow:!0,maxShadowOpacity:.18}),r.loadFromHTML(P),setTimeout(()=>{try{r.update()}catch{}},120),setTimeout(()=>{try{r.update()}catch{}},320)}function h(){const{vw:e,vh:t}=M(),o=t>=e,s=o?e:Math.floor(e/2);I(s,t,o)}let w;const f=()=>{clearTimeout(w),w=setTimeout(h,80)};window.addEventListener("resize",f,{passive:!0}),window.addEventListener("orientationchange",f,{passive:!0}),document.addEventListener("visibilitychange",f),h(),window.addEventListener("load",()=>setTimeout(h,60),{once:!0}),document.addEventListener("pointerdown",e=>{if(e.target.closest(".js-go-index,.fab-home")){e.preventDefault(),e.stopImmediatePropagation();try{r.turnToPage(C)}catch{}return}const o=e.target.closest(".index .row");if(o){e.preventDefault(),e.stopImmediatePropagation();const s=p[o.dataset.goto];if(typeof s=="number")try{r.turnToPage(s)}catch{}else console.warn("[\xCDNDICE] clave sin \xEDndice calculado:",o.dataset.goto,p)}},!0),g.querySelectorAll(".page").forEach((e,t)=>e.dataset.pageno=t+1),(function(){const t=document.createElement("div");t.className="lightbox",t.innerHTML=`
-    <button class="lb-close" type="button" aria-label="Regresar">Regresar</button>
-    <img class="lb-img" alt="">
-  `,document.body.appendChild(t);const o=t.querySelector(".lb-img"),s=t.querySelector(".lb-close");function i(n){const m=n.target.closest(".img-card");if(!m)return;n.preventDefault(),n.stopImmediatePropagation();const d=m.querySelector("img");d&&(o.src=d.currentSrc||d.src,t.classList.add("open"),document.body.classList.add("lb-open"))}document.addEventListener("pointerdown",i,!0);function l(){t.classList.remove("open"),document.body.classList.remove("lb-open")}t.addEventListener("click",l),s.addEventListener("click",n=>{n.preventDefault(),l()}),window.addEventListener("keydown",n=>{document.body.classList.contains("lb-open")&&n.key==="Escape"&&(n.preventDefault(),l())},!0)})(),(function(){const t=o=>{document.body.classList.contains("lb-open")&&(o.target&&o.target.closest(".lightbox")||(o.stopImmediatePropagation(),o.preventDefault()))};["pointerdown","pointermove","pointerup","mousedown","mousemove","mouseup","click","touchstart","touchmove","touchend","wheel","keydown"].forEach(o=>window.addEventListener(o,t,!0))})(),document.addEventListener("pointerdown",e=>{if(e.target.closest(".js-go-index,.fab-home")){e.preventDefault(),e.stopImmediatePropagation();try{r.turnToPage(C)}catch{}return}const o=e.target.closest(".index .row");if(o){e.preventDefault(),e.stopImmediatePropagation();const s=p[o.dataset.goto];if(typeof s=="number")try{r.turnToPage(s)}catch{}else console.warn("[\xCDNDICE] clave sin \xEDndice calculado:",o.dataset.goto,p)}},!0)});
+'use strict';
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('[INIT] DOMContentLoaded');
+
+  const root = document.querySelector('.flipbook-root');
+  const book = document.getElementById('book');
+  if (!root || !book){ console.error('❌ Falta .flipbook-root o #book'); return; }
+  if (!window.St || !St.PageFlip){ console.error('❌ No cargó PageFlip (revisa nombre/orden del script de la librería)'); return; }
+
+  /* ===== Datos mínimos (usa los tuyos) ===== */
+  const CATEGORIES = [
+    'Manteleria','PastoSintetico','Carpas','Charcuteria','Desayunos','Mobiliario',
+    'Tapes','Cafe','Jardin','Salon','MesaDeDulces','Salas','PlatosBase','Copas',
+    'PistaLED','Inflables','Sillones','MesaDeNovios','Letras','Ubicacion'
+  ];
+  const IMAGES = {
+    PastoSintetico: ['images/PastoSintetico/pasto1.jpeg','images/PastoSintetico/pasto2.jpeg','images/PastoSintetico/pasto3.jpeg'],
+    Manteleria: Array.from({length:6}, (_,i)=>`images/Manteleria/manteleria${i+1}.jpeg`),
+    Carpas: Array.from({length:6}, (_,i)=>`images/Carpas/Carpas${i+1}.jpeg`),
+    Charcuteria: Array.from({length:6}, (_,i)=>`images/Charcuteria/Charcuteria${i+1}.jpeg`),
+    Desayunos: Array.from({length:6}, (_,i)=>`images/Desayunos/Desayunos${i+1}.jpeg`),
+    Mobiliario: Array.from({length:6}, (_,i)=>`images/Mobiliario/Mobiliario${i+1}.jpeg`),
+    Tapes: ['images/Tapes/tape1.jpeg'],
+    Cafe: Array.from({length:5}, (_,i)=>`images/Cafe/Cafe${i+1}.jpeg`),
+    Jardin: ['images/Jardin/Jardin1.jpeg','images/Jardin/Jardin2.jpeg','images/Jardin/Jardin3.jpeg'],
+    Salon: ['images/Salon/Salon1.jpeg','images/Salon/salon2.jpeg','images/Salon/salon3.jpeg'],
+    MesaDeDulces: Array.from({length:7}, (_,i)=>`images/MesaDeDulces/MesadeDulces${i+1}.jpeg`),
+    Salas: ['images/Salas/sala1.jpeg','images/Salas/sala2.jpeg'],
+    PlatosBase: [
+      'images/PlatosBase/platobase1.jpeg','images/PlatosBase/platobase2.jpeg',
+      'images/PlatosBase/platobase3.jpeg','images/PlatosBase/platobase4.jpeg',
+      'images/PlatosBase/platobase5.jpeg'
+    ],
+    Copas: Array.from({length:5}, (_,i)=>`images/Copas/copa${i+1}.jpeg`),
+    PistaLED: ['images/PistaLED/pistas led.jpeg'],
+    Inflables: ['images/Inflables/inflables.jpeg'],
+    Sillones: ['images/Sillones/sillones.jpeg'],
+    MesaDeNovios: ['images/MesaDeNovios/mesa de novios.jpeg'],
+    Letras: ['images/Letras/Letras.jpeg'],
+    Ubicacion: []
+  };
+
+  const E = (tag, attrs={}, ...children)=>{ const el=document.createElement(tag); for(const [k,v] of Object.entries(attrs)){ if (k === 'class') el.className = v; else if (k === 'dataset') Object.assign(el.dataset, v); else el.setAttribute(k, v);} children.flat().forEach(ch=>{ if (typeof ch === 'string') el.appendChild(document.createTextNode(ch)); else if (ch) el.appendChild(ch); }); return el; };
+  const chunk=(arr,size)=>{const out=[]; for(let i=0;i<arr.length;i+=size) out.push(arr.slice(i,i+size)); return out;};
+  const pageDom=(density='soft')=>{ const p=E('div',{class:'page'}); p.dataset.density=density; return p; };
+  const gridDom=(images,cls)=>{ const wrap=E('div',{class:cls}); images.forEach(src=>{ const a=E('a',{href:'#',class:'img-card js-lightbox'}); const img=E('img',{loading:'lazy',src:encodeURI(src),alt:''}); a.appendChild(img); wrap.appendChild(a); }); return wrap; };
+
+  const pages=[]; const firstIndexByCat=Object.create(null);
+
+  // Portada
+  {
+    const p=pageDom('hard');
+    p.appendChild(E('section',{class:'cover-custom'},
+      E('div',{class:'left-side'}, E('div',{class:'marble'})),
+      E('div',{class:'right-side'},
+        E('h1',{class:'title-cover'},'NUESTROS',E('br'),'PRODUCTOS',E('br'),'PIGO´S'),
+        E('div',{class:'author'},'José Antonio Gómez Domínguez'),
+        E('div',{class:'phone'},'7226307655')
+      )));
+    pages.push(p);
+  }
+  // Índice
+  const INDEX_PAGE = pages.length;
+  {
+    const p=pageDom('hard'); const cols=E('div',{class:'cols'});
+    CATEGORIES.forEach(c=>{ const row=E('div',{class:'row',dataset:{goto:c}}); row.appendChild(E('img',{src:'assets/bullet.png',alt:''})); row.appendChild(E('span',{},c.replace(/([A-Z])/g,' $1').trim().replace('De ','de '))); cols.appendChild(row); });
+    p.appendChild(E('section',{class:'index'}, E('div',{class:'bg'}), E('div',{class:'wrap'}, E('h1',{class:'title'},'ÍNDICE'), cols)));
+    pages.push(p);
+  }
+  // Categorías
+  function addCategory(title,key,imgs){ if(!imgs?.length) return; const groups=chunk(imgs,6); groups.forEach((group,gi)=>{ const n=group.length; const gridClass=n===1?'layout-1-hero':n===2?'layout-2-split':n===3?'layout-3-split':n===4?'layout-4-2x2':'layout-6-hero-3-2'; const p=pageDom(); const cat=E('div',{class:'cat-page'}); if(gi===0){ p.dataset.cat=key; firstIndexByCat[key]=pages.length; } cat.appendChild(E('div',{class:'title-bar'}, E('h2',{class:'h2 title-with-logo'}, E('img',{class:'title-logo',src:'assets/logo_circle.png',alt:''}), E('span',{class:'title-text'},title)))); cat.appendChild(gridDom(group,gridClass)); p.appendChild(cat); p.appendChild(E('a',{href:'#',class:'fab-home js-go-index','aria-label':'Regresar al índice'},(()=>{const svg=E('svg',{viewBox:'0 0 24 24',width:'22',height:'22'}); svg.appendChild(E('path',{fill:'currentColor', d:'M10.707 2.293a1 1 0 0 1 1.414 0l9 9a1 1 0 1 1-1.414 1.414L20 12.414V20a2 2 0 0 1-2 2h-4a1 1 0 0 1-1-1v-5H11v5a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2v-7.586l-.707.707A1 1 0 0 1 1.879 11.293l9-9Z'})); return svg;})())); pages.push(p); }); }
+  CATEGORIES.forEach(k=> addCategory(k.replace(/([A-Z])/g,' $1').replace(/^ /,'').replace('De ','de '), k, IMAGES[k]));
+  // Ubicación
+  { const p=pageDom(); p.dataset.cat='Ubicacion'; firstIndexByCat['Ubicacion']=pages.length; p.appendChild(E('section',{class:'contact contact-ubicacion'}, E('div',{class:'title-bar'}, E('h2',{class:'h2 title-with-logo'}, E('img',{class:'title-logo',src:'assets/logo_circle.png',alt:''}), E('span',{class:'title-text'},'UBICACIÓN & CONTACTO'))))); pages.push(p); }
+
+  // Montar DOM
+  pages.forEach(pg=>book.appendChild(pg));
+  const domPages = Array.from(book.querySelectorAll('.page'));
+
+  let pageFlip = null;
+  function createFlipbook(pageW,pageH,isPortrait){
+    if(pageFlip && pageFlip.destroy){ try{pageFlip.destroy();}catch(_){} }
+    pageFlip = new St.PageFlip(root, { size:'fixed', width:pageW, height:pageH, showCover:true, usePortrait:isPortrait, mobileScrollSupport:true, flippingTime:900, drawShadow:true, maxShadowOpacity:0.18 });
+    pageFlip.loadFromHTML(domPages);
+    setTimeout(()=>{ try{ pageFlip.update(); }catch(_){} },120);
+    setTimeout(()=>{ try{ pageFlip.update(); }catch(_){} },320);
+  }
+  function fit(){
+    const vw = Math.max(1, innerWidth);
+    const vh = Math.max(1, innerHeight);
+    const isPortrait = vh >= vw;
+    const pageW = isPortrait ? vw : Math.floor(vw/2);
+    const pageH = vh;
+    createFlipbook(pageW,pageH,isPortrait);
+  }
+  let _tid; const requestFit=()=>{ clearTimeout(_tid); _tid=setTimeout(fit,80); };
+  window.addEventListener('resize',requestFit,{passive:true});
+  window.addEventListener('orientationchange',requestFit,{passive:true});
+  document.addEventListener('visibilitychange',requestFit);
+  fit();
+  window.addEventListener('load',()=>setTimeout(fit,60),{once:true});
+
+  // Numeración
+  book.querySelectorAll('.page').forEach((p,i)=> p.dataset.pageno=i+1);
+
+  // Lightbox
+  (function(){ const lb=document.createElement('div'); lb.className='lightbox'; lb.innerHTML=`<button class="lb-close" type="button" aria-label="Regresar">Regresar</button><img class="lb-img" alt="">`; document.body.appendChild(lb); const lbImg=lb.querySelector('.lb-img'); const btn=lb.querySelector('.lb-close'); document.addEventListener('pointerdown',ev=>{ const card=ev.target.closest('.img-card'); if(!card) return; ev.preventDefault(); ev.stopImmediatePropagation(); const img=card.querySelector('img'); if(!img) return; lbImg.src=img.currentSrc||img.src; lb.classList.add('open'); document.body.classList.add('lb-open'); },true); const close=()=>{ lb.classList.remove('open'); document.body.classList.remove('lb-open'); }; lb.addEventListener('click',close); btn.addEventListener('click',e=>{ e.preventDefault(); close(); });})();
+
+  // Home/Índice prioridad
+  document.addEventListener('pointerdown',ev=>{ const go=ev.target.closest('.js-go-index,.fab-home'); if(go){ ev.preventDefault(); ev.stopImmediatePropagation(); try{ pageFlip.turnToPage(INDEX_PAGE); }catch(_){} return; } const row=ev.target.closest('.index .row'); if(row){ ev.preventDefault(); ev.stopImmediatePropagation(); const idx=firstIndexByCat[row.dataset.goto]; if(typeof idx==='number'){ try{ pageFlip.turnToPage(idx); }catch(_){} } } },true);
+
+});
