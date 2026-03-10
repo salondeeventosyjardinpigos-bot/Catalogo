@@ -2,16 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
+  <!-- Viewport real (iOS/Android) -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Catálogo PIGO'S — Flipbook (Baseline)</title>
+  <title>Catálogo PIGO'S — Flipbook</title>
 
-  <!-- CSS principal -->
+  <!-- 1) CSS principal -->
   <link rel="stylesheet" href="styles.css" />
 
-  <!-- Fallback mínimo: garantiza caja si el CSS tarda o falla -->
+  <!-- 2) Fallback MUY PEQUEÑO: garantiza caja para .flipbook-root si el CSS tarda/falla -->
   <style>
-    html,body{margin:0}
-    .flipbook-root{width:100vw;height:100vh;overflow:hidden;background:#fff}
+    html, body { margin:0 }
+    .flipbook-root { width:100vw; height:100vh; overflow:hidden; background:#fff }
   </style>
 </head>
 <body>
@@ -20,10 +21,14 @@
     <div id="book"></div>
   </div>
 
-  <!-- Librería PageFlip: asegúrate de que este nombre coincide con tu archivo real -->
+  <!-- 3) Librería PageFlip. ATENCIÓN al nombre: usa el que tengas realmente en el repo -->
   <script src="page-flip.browser.min.js" defer></script>
+  <!-- Si tu archivo es con guion_bajo, usa:
+  <script src="page_flip.browser.min.js" defer></script>
+  -->
 
-  <!-- Tu script (después de la librería) -->
+  <!-- 4) Tu script, con defer -->
   <script src="script.js" defer></script>
 </body>
 </html>
+``
