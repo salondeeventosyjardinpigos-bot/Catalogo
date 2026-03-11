@@ -4,19 +4,21 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>DIAG PageFlip</title>
-  <style>
-    html,body{margin:0}
-    .box{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-    pre{background:#111;color:#0f0;padding:16px;border-radius:8px;max-width:90vw;max-height:90vh;overflow:auto;font:14px/1.4 system-ui,Segoe UI,Arial}
-  </style>
+  <style>html,body{margin:0}.box{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font:16px system-ui}pre{background:#111;color:#0f0;padding:16px;border-radius:8px;max-width:90vw;overflow:auto}</style>
 </head>
 <body>
   <div class="box"><pre id="log">Cargando…</pre></div>
-
-  <!-- Usa el nombre EXACTO que tengas en el repo. Si tu archivo real es con guion_bajo, cambia esta línea a page_flip.browser.min.js -->
   <script src="page-flip.browser.min.js" defer></script>
-
-  <!-- JS externo de diagnóstico (solo ASCII) -->
-  <script src="diag.js" defer></script>
+  <script>
+    const log=(...a)=>{const p=document.getElementById('log');p.textContent+='
+'+a.map(v=>typeof v==='object'?JSON.stringify(v,null,2):String(v)).join(' ')};
+    window.addEventListener('load',()=>{
+      log('[DIAG] window.St?',!!window.St); log('[DIAG] St.PageFlip?',!!(window.St&&St.PageFlip));
+      if(!window.St||!St.PageFlip){ log('🔴 NO cargó la librería. Verifica nombre/ruta: page-flip.browser.min.js'); return; }
+      const root=document.createElement('div'); root.style='position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;background:#fff'; document.body.appendChild(root);
+      const book=document.createElement('div'); book.innerHTML='<div class="page" data-density="hard" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:24px system-ui">PORTADA</div><div class="page" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font:24px system-ui">PÁGINA 2</div>'; root.appendChild(book);
+      try{ const vw=Math.max(1,innerWidth), vh=Math.max(1,innerHeight); const isP=vh>=vw; const pf=new St.PageFlip(root,{size:'fixed',width:isP?vw:Math.floor(vw/2),height:vh,showCover:true,usePortrait:isP}); pf.loadFromHTML(book.querySelectorAll('.page')); setTimeout(()=>pf.update(),120); setTimeout(()=>pf.update(),320); log('🟢 Libro mínimo creado'); }catch(e){ log('🔴 Error creando PF:',e.message||e); }
+    });
+  </script>
 </body>
 </html>
