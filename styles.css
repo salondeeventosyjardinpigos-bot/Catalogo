@@ -1,1 +1,24 @@
-:root{--brand-blue:#1F4E79;--brand-gold:#C39A36;--ink:#0e2747;--paper:#ffffff;--page-bottom-safe: 68px}*{box-sizing:border-box}html,body{height:100%;margin:0;background:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}.flipbook-root{position:fixed;inset:0;width:100vw;height:100vh;margin:0;border-radius:0;overflow:hidden;background:#fff}.page{position:relative;width:100%;height:100%;background:var(--paper);padding:20px 28px 28px}.stf__page,.stf__item,.stf__wrapper,.stf__block,.stf__inner,.stf__outer{background:#fff!important}.stf__book{background:#f6f7f7!important}.fab-home{position:absolute!important;left:50%!important;bottom:14px!important;transform:translate(-50%)!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:44px!important;height:44px!important;border-radius:50%!important;color:#1f4e79!important;background:#fff!important;border:1px solid rgba(0,0,0,.12)!important;box-shadow:0 6px 16px #00000029!important;z-index:999999!important}.fab-home svg{display:block;width:22px;height:22px;fill:currentColor}
+:root{
+  --brand-blue:#1F4E79; --brand-gold:#C39A36; --ink:#0e2747; --paper:#ffffff; --page-bottom-safe: 68px;
+}
+*{ box-sizing:border-box }
+html,body{ height:100%; margin:0; background:var(--ink); font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif; }
+/* Caja garantizada SIEMPRE */
+.flipbook-root{ position:fixed; inset:0; width:100vw; height:100vh; margin:0; border-radius:0; overflow:hidden; background:#fff; }
+.page{ position:relative; width:100%; height:100%; background:var(--paper); padding:20px 28px 28px; }
+.stf__page,.stf__item,.stf__wrapper,.stf__block{background:#fff!important}
+.stf__inner,.stf__outer{background:#fff!important}
+.stf__book{background:#f6f7f7!important}
+.fab-home{ position:absolute!important; left:50%!important; bottom:14px!important; transform:translateX(-50%)!important; display:inline-flex!important; align-items:center!important; justify-content:center!important; width:44px!important; height:44px!important; border-radius:50%!important; color:#1F4E79!important; background:#fff!important; border:1px solid rgba(0,0,0,.12)!important; box-shadow:0 6px 16px rgba(0,0,0,.16)!important; z-index:999999!important; text-decoration:none!important; }
+.fab-home svg{ display:block; width:22px; height:22px; fill: currentColor; }
+/* Layout mínimo (puedes mantener los tuyos completos) */
+.h2{font-size:30px;font-weight:800;color:var(--brand-blue);margin:0 0 12px}
+.cover-custom{ width:100%; height:100%; display:flex; position:relative; background:#fff; overflow:hidden }
+.cover-custom .left-side{ width:48%; height:100%; position:relative; background:#fff }
+.cover-custom .left-side .marble{ position:absolute; inset:0; background:url('assets/logo_pigos.jpg') center/cover no-repeat; opacity:.9; clip-path:ellipse(130% 50% at -15% 50%) }
+.cover-custom .right-side{ width:70%; padding:40px 10px 40px 20px; display:flex; flex-direction:column; justify-content:center }
+.index .bg{ position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.25), rgba(0,0,0,.25)), url('assets/indice_bg.jpg') center/cover no-repeat }
+.index .wrap{ position:relative; z-index:1; height:100%; display:flex; flex-direction:column; padding:28px }
+.index .title{ font-weight:900; text-align:center; margin:0 0 12px; font-size:44px; color:#fff }
+.index .cols{ display:grid; grid-template-columns:1fr 1fr; gap:12px 26px; overflow:auto; padding:8px }
+.index .row{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; color:#fff; font-weight:800; font-size:21px; cursor:pointer }
