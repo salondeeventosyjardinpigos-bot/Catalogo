@@ -1,25 +1,42 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="auto">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Catálogo PIGO'S — Galería (Fallback rápido)</title>
+  <title>Catálogo PIGO'S — Revista Digital</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <h1>Catálogo PIGO'S</h1>
-    <nav id="nav"></nav>
+    <div class="brand">
+      <img class="logo" src="assets/logo_circle.png" alt="PIGO'S" onerror="this.style.display='none'"/>
+      <h1>Catálogo PIGO'S</h1>
+    </div>
+    <nav id="nav" aria-label="Secciones"></nav>
+    <div class="actions">
+      <button id="themeToggle" class="btn" aria-label="Cambiar tema">🌓</button>
+      <a class="btn whats" target="_blank" rel="noopener" href="https://wa.me/527226307655?text=Hola%20quiero%20m%C3%A1s%20informaci%C3%B3n">WhatsApp</a>
+    </div>
   </header>
 
-  <!-- Carril de "páginas" con scroll-snap, cada sección es una categoría -->
-  <main class="pages" id="pages"></main>
+  <main id="pages" class="pages" tabindex="0">
+    <!-- La portada y las secciones se generan desde app.js -->
+  </main>
 
-  <!-- Lightbox simple -->
-  <div class="lightbox" id="lb">
-    <button class="lb-close" aria-label="Cerrar">×</button>
-    <img class="lb-img" alt=""/>
+  <!-- Lightbox -->
+  <div class="lightbox" id="lb" aria-hidden="true" role="dialog">
+    <button class="lb-close" id="lbClose" aria-label="Cerrar">×</button>
+    <img class="lb-img" id="lbImg" alt=""/>
   </div>
+
+  <footer class="footer" id="contacto">
+    <div class="socials">
+      <a href="https://wa.me/527226307655" target="_blank" rel="noopener">WhatsApp: 722 630 7655</a>
+      <a href="https://www.instagram.com/pigosalquiler/" target="_blank" rel="noopener">Instagram @pigosalquiler</a>
+      <a href="https://www.facebook.com/share/1DDrS8JTB6/?mibextid=wwXIfr" target="_blank" rel="noopener">Facebook</a>
+    </div>
+    <small>© PIGO'S · Catálogo digital</small>
+  </footer>
 
   <script src="app.js"></script>
 </body>
