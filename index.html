@@ -3,27 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Catálogo PIGO'S — Flipbook</title>
-
-  <!-- CSS principal -->
+  <title>Catálogo PIGO'S — Galería (Fallback rápido)</title>
   <link rel="stylesheet" href="styles.css" />
-
-  <!-- Fallback mínimo: garantiza caja si el CSS tarda o falla -->
-  <style>
-    html,body{margin:0}
-    .flipbook-root{width:100vw;height:100vh;overflow:hidden;background:#fff}
-  </style>
 </head>
 <body>
+  <header class="topbar">
+    <h1>Catálogo PIGO'S</h1>
+    <nav id="nav"></nav>
+  </header>
 
-  <div class="flipbook-root">
-    <div id="book"></div>
+  <!-- Carril de "páginas" con scroll-snap, cada sección es una categoría -->
+  <main class="pages" id="pages"></main>
+
+  <!-- Lightbox simple -->
+  <div class="lightbox" id="lb">
+    <button class="lb-close" aria-label="Cerrar">×</button>
+    <img class="lb-img" alt=""/>
   </div>
 
-  <!-- Librería PageFlip: ajusta el NOMBRE si en tu repo es page_flip.browser.min.js -->
-  <script src="page-flip.browser.min.js" defer></script>
-
-  <!-- Tu script -->
-  <script src="script.js" defer></script>
+  <script src="app.js"></script>
 </body>
 </html>
