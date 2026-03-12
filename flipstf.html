@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Catálogo – Flip (StPageFlip)</title>
+  <style>
+    html,body{margin:0;height:100%;background:#fff}
+    #book{width:100vw;height:100vh;background:#fff}
+    .tip{position:fixed;z-index:9;left:10px;bottom:10px;background:rgba(0,0,0,.55);color:#fff;padding:6px 10px;border-radius:8px;font:12px system-ui}
+  </style>
+</head>
+<body>
+  <div id="book"></div>
+  <div class="tip">Sugerencia: gira el teléfono para ver 2 páginas</div>
+
+  <!-- CDN StPageFlip -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+  <script>
+    // ======== PÁGINAS DEL CATÁLOGO ========
+    // Rellena con tus archivos reales en estas carpetas.
+    // Portada y contraportada deben ir al inicio y al final respectivamente.
+    const PAGES = [
+      // Portada
+      'images/Portada/portada.jpg',
+
+      // Mantelería
+      'images/Manteleria/manteleria01.jpg',
+      'images/Manteleria/manteleria02.jpg',
+      'images/Manteleria/manteleria03.jpg',
+
+      // Pasto Sintético
+      'images/PastoSintetico/pasto1.jpg',
+      'images/PastoSintetico/pasto2.jpg',
+
+      // Carpas
+      'images/Carpas/carpas01.jpg',
+      'images/Carpas/carpas02.jpg',
+
+      // Charcutería
+      'images/Charcuteria/charcuteria01.jpg',
+
+      // Desayunos
+      'images/Desayunos/desayunos01.jpg',
+
+      // Mobiliario
+      'images/Mobiliario/mobiliario01.jpg',
+
+      // Tapes
+      'images/Tapes/tape1.jpg',
+
+      // Café
+      'images/Cafe/cafe01.jpg',
+
+      // Jardín
+      'images/Jardin/jardin1.jpg',
+
+      // Salón
+      'images/Salon/salon1.jpg',
+
+      // Mesa de Dulces
+      'images/MesaDeDulces/mesadulces01.jpg',
+
+      // Salas
+      'images/Salas/sala1.jpg',
+
+      // Platos Base
+      'images/PlatosBase/platobase1.jpg',
+
+      // Copas
+      'images/Copas/copa1.jpg',
+
+      // Pista LED
+      'images/PistaLED/pista_led1.jpg',
+
+      // Inflables
+      'images/Inflables/inflables1.jpg',
+
+      // Sillones
+      'images/Sillones/sillones1.jpg',
+
+      // Mesa de Novios
+      'images/MesaDeNovios/mesa_novios1.jpg',
+
+      // Letras
+      'images/Letras/letras1.jpg',
+
+      // Contraportada
+      'images/Contraportada/contraportada.jpg'
+    ];
+
+    const root = document.getElementById('book');
+    let pf = null, lastKey = '';
+
+    function getKey(){
+      const vw=Math.max(1, innerWidth), vh=Math.max(1, innerHeight), isP = vh>=vw;
+      return [isP ? vw : Math.floor(vw/2), vh, isP].join('x');
+    }
+
+    function initFlip(){
+      if(!PAGES.length){ root.innerHTML='<div style="padding:18px">Configura el arreglo PAGES con tus rutas reales.</div>'; return; }
+      const vw=Math.max(1, innerWidth), vh=Math.max(1, innerHeight), isP = vh>=vw;
+      const key=getKey(); if(key===lastKey && pf){ try{pf.update();}catch(e){} return; }
+      lastKey=key; root.innerHTML='';
+      try{ if(pf && pf.destroy) pf.destroy(); }catch(_){ }
+      pf = new St.PageFlip(root, {
+        size:'fixed', width: isP ? vw : Math.floor(vw/2), height: vh,
+        showCover:true, usePortrait:isP, mobileScrollSupport:true,
+        flippingTime:900, drawShadow:true, maxShadowOpacity:0.18
+      });
+      pf.loadFromImages(PAGES);
+      setTimeout(()=>{ try{pf.update();}catch(_){ } }, 240);
+    }
+
+    addEventListener('resize', ()=>setTimeout(initFlip,110), {passive:true});
+    addEventListener('orientationchange', ()=>setTimeout(initFlip,110), {passive:true});
+    initFlip();
+
+    // Atajos teclado desktop
+    document.addEventListener('keydown', e=>{
+      if(!pf) return;
+      if(e.key==='ArrowRight') try{pf.turnToNextPage();}catch(_){ }
+      if(e.key==='ArrowLeft')  try{pf.turnToPrevPage();}catch(_){ }
+    });
+  </script>
+</body>
+</html>
