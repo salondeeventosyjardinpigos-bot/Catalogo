@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Catálogo – Flip PDF → Flipbook</title>
+  <style>
+    html,body{margin:0;height:100%;background:#fff;overscroll-behavior:none}
+    #book{width:100vw;height:100vh;background:#fff}
+    .overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;z-index:9}
+    .bar{width:min(520px,80vw);height:10px;border-radius:10px;background:#eee;overflow:hidden;box-shadow:inset 0 0 0 1px #ddd}
+    .bar>i{display:block;height:100%;width:0;background:#1F4E79;transition:width .2s}
+    .msg{margin:14px 0 6px 0;font:14px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;color:#334}
+    .hint{font:12px/1.4 system-ui;color:#667}
+  </style>
+</head>
+<body>
+  <div id="book"></div>
+  <div class="overlay" id="ov">
+    <div class="msg" id="ovmsg">Preparando páginas…</div>
+    <div class="bar"><i id="ovbar"></i></div>
+    <div class="hint">Sugerencia: en portrait verás 1 página, en landscape 2 páginas</div>
+  </div>
+
+  <!-- StPageFlip -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+  <!-- PDF.js -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script>
+    // === CONFIGURA AQUÍ ===
+    // Coloca tu PDF en /Catalogo/catalogo.pdf (o ajusta la ruta)
+    const PDF_URL = 'catalogo.pdf';
+
+    // PDF.js worker (misma versión)
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+    const root = document.getElementById('book');
+    const ov   = document.getElementById('ov');
+    const ovbar= document.getElementById('ovbar');
+    const ovmsg= document.getElementById('ovmsg');
+
+    const isPortrait = ()=> innerHeight >= innerWidth;
+    const pagePixelWidth = ()=> Math.max(innerWidth, Math.floor(innerWidth/2)); // render ancho suficiente para ambos modos
+
+    async function renderPdfToImages(url){
+      const doc = await pdfjsLib.getDocument(url).promise;
+      const count = doc.numPages;
+      const urls = [];
+      for (let i=1;i<=count;i++){
+        const page = await doc.getPage(i);
+        const vw = pagePixelWidth();
+        const viewport = page.getViewport({ scale: 1 });
+        const scale = vw / viewport.width; // ajusta al ancho objetivo
+        const v2 = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.floor(v2.width);
+        canvas.height = Math.floor(v2.height);
+        const ctx = canvas.getContext('2d', { alpha:false, desynchronized:true });
+        await page.render({ canvasContext: ctx, viewport: v2 }).promise;
+
+        // JPEG para aligerar (calidad 0.8)
+        const blob = await new Promise(res=> canvas.toBlob(res,'image/jpeg',0.8));
+        const urlObj = URL.createObjectURL(blob);
+        urls.push(urlObj);
+
+        ovbar.style.width = Math.round((i/count)*100)+'%';
+        ovmsg.textContent = `Renderizando páginas… ${i}/${count}`;
+      }
+      return urls;
+    }
+
+    function createFlip(images){
+      const useP = isPortrait();
+      const w = useP ? innerWidth : Math.floor(innerWidth/2);
+      const h = innerHeight;
+
+      const pf = new St.PageFlip(root, {
+        size:'fixed', width:w, height:h, showCover:true, usePortrait:useP,
+        mobileScrollSupport:true, flippingTime:900, drawShadow:true, maxShadowOpacity:0.18
+      });
+      pf.loadFromImages(images);
+      setTimeout(()=>{ try{pf.update();}catch(_){} }, 240);
+
+      // Ajuste en cambios de tamaño/orientación
+      let t;
+      addEventListener('resize',()=>{ clearTimeout(t); t=setTimeout(()=>{
+        const useP2 = isPortrait();
+        try{ pf.update({ width: useP2? innerWidth: Math.floor(innerWidth/2), height: innerHeight }); }catch(_){}
+      },120); },{passive:true});
+    }
+
+    (async()=>{
+      try{
+        const imgs = await renderPdfToImages(PDF_URL);
+        createFlip(imgs);
+        ov.remove();
+      }catch(e){
+        console.error(e);
+        ovmsg.textContent = 'No se pudo cargar catalogo.pdf';
+      }
+    })();
+  </script>
+</body>
+</html>
