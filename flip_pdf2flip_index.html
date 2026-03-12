@@ -3,19 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Catálogo – Flip PDF → Flipbook + Índice</title>
+  <title>Catálogo – Flip PDF (alta) + Índice + Zoom 3/4</title>
   <style>
     html,body{margin:0;height:100%;background:#fff;overscroll-behavior:none}
     #book{width:100vw;height:100vh;background:#fff}
+
     .overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;z-index:9}
     .bar{width:min(520px,80vw);height:10px;border-radius:10px;background:#eee;overflow:hidden;box-shadow:inset 0 0 0 1px #ddd}
     .bar>i{display:block;height:100%;width:0;background:#1F4E79;transition:width .2s}
     .msg{margin:14px 0 6px 0;font:14px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;color:#334}
     .hint{font:12px/1.4 system-ui;color:#667}
 
-    /* Índice flotante */
+    /* FAB Índice */
     .fab{position:fixed; right:14px; bottom:16px; z-index:50}
     .fab button{width:48px;height:48px;border-radius:50%;border:0;background:#1F4E79;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+
+    /* Panel del índice */
     .panel{position:fixed; right:14px; bottom:76px; width:min(90vw, 360px); max-height:70vh; overflow:auto; background:#fff; border:1px solid #e7e9ef; border-radius:12px; box-shadow:0 14px 60px rgba(0,0,0,.3); display:none; z-index:60}
     .panel.open{display:block}
     .panel h3{margin:12px 12px 8px 12px; font:700 16px/1 system-ui; color:#1F4E79}
@@ -24,50 +27,55 @@
     .panel button.link{width:100%; text-align:left; padding:10px 12px; background:#fff; border:0; border-radius:10px; cursor:pointer; font:600 14px/1.1 system-ui; color:#223}
     .panel button.link:hover{background:#f6f8fb}
 
-    /* Zoom */
-    .zoom{position:fixed; inset:0; background:rgba(0,0,0,.92); display:none; align-items:center; justify-content:center; z-index:99}
-    .zoom.open{display:flex}
-    .zoom img{max-width:96vw; max-height:96vh; border-radius:8px; box-shadow:0 20px 80px rgba(0,0,0,.6); touch-action:pinch-zoom}
-    .zoom .close{position:absolute; top:14px; right:18px; width:44px; height:44px; border-radius:50%; border:0; background:#fff; font-size:26px; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.35)}
-
-    /* Botón volver al índice (aparece siempre) */
-    .home{position:fixed; left:14px; bottom:16px; z-index:50}
-    .home button{width:48px;height:48px;border-radius:50%;border:0;background:#fff;color:#1F4E79;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.35); border:1px solid #dde3ef}
+    /* Zoom 3/4 */
+    .zoom{
+      position:fixed; inset:0; background:rgba(0,0,0,.55);
+      display:none; align-items:center; justify-content:center; z-index:99; padding:2vh 2vw;
+    }
+    .zoom.open{ display:flex }
+    .zoom .frame{
+      width:min(75vw, 960px);
+      height:min(75vh, 720px);
+      background:#000; border-radius:10px; box-shadow:0 18px 80px rgba(0,0,0,.45);
+      display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;
+    }
+    .zoom img{ max-width:100%; max-height:100%; object-fit:contain; background:#000; touch-action:pinch-zoom }
+    .zoom .close{
+      position:absolute; top:10px; right:12px; width:40px; height:40px; border-radius:50%;
+      border:0; background:#fff; font-size:22px; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.35)
+    }
   </style>
 </head>
 <body>
   <div id="book"></div>
   <div class="overlay" id="ov">
-    <div class="msg" id="ovmsg">Preparando páginas…</div>
+    <div class="msg" id="ovmsg">Preparando páginas en alta…</div>
     <div class="bar"><i id="ovbar"></i></div>
-    <div class="hint">Sugerencia: portrait=1 página · landscape=2 páginas · tap centro=zoom</div>
+    <div class="hint">portrait=1 página · landscape=2 páginas · tap centro=zoom (3/4)</div>
   </div>
 
-  <!-- FAB Índice -->
+  <!-- Índice -->
   <div class="fab"><button id="btnIndex" title="Índice">☰</button></div>
-  <div class="panel" id="panel">
-    <h3>Índice</h3>
-    <ul id="panelList"></ul>
-  </div>
-
-  <!-- Botón volver al índice -->
-  <div class="home"><button id="btnHome" title="Ir al índice">⌂</button></div>
+  <div class="panel" id="panel"><h3>Índice</h3><ul id="panelList"></ul></div>
 
   <!-- Zoom -->
-  <div class="zoom" id="zoom"><button class="close" id="zoomClose" aria-label="Cerrar">×</button><img id="zoomImg" alt=""></div>
+  <div class="zoom" id="zoom">
+    <div class="frame">
+      <button class="close" id="zoomClose" aria-label="Cerrar">×</button>
+      <img id="zoomImg" alt="">
+    </div>
+  </div>
 
   <!-- StPageFlip -->
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
   <!-- PDF.js -->
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script>
-    // ====== CONFIGURACIÓN ======
-    const PDF_URL = 'catalogo.pdf';   // sube tu PDF con este nombre (o ajusta)
+    // ===== Config =====
+    const PDF_URL    = 'catalogo.pdf'; // pon aquí tu PDF final
+    const INDEX_PAGE = 2;              // nº de página (1-based) del índice dentro del PDF
 
-    // Número 1-based de la página de ÍNDICE dentro del PDF (ajústalo si cambiaste el orden)
-    const INDEX_PAGE = 2;
-
-    // Mapa de categorías -> página (1-based). Ajusta si tu export cambia el orden.
+    // Mapa Categoría -> Página (1-based). Ajusta si cambias el orden en tu export.
     const INDEX_MAP = {
       'Mantelería':       3,
       'Pasto sintético':  4,
@@ -91,85 +99,89 @@
       'Ubicación':        23
     };
 
-    // === PDF.js worker ===
+    // PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
-    // ===== Calidad / tamaño =====
-    const DPR = Math.min(2, window.devicePixelRatio || 1);
-    const BASE_BOOST = 1.25;    // render base un poco mayor
-    const BASE_MAX_W = 1800;    // tope base
-    const ZOOM_MAX_W = 2800;    // tope zoom
+    // Calidad alta desde el inicio
+    const DPR          = Math.min(2, window.devicePixelRatio || 1);
+    const BASE_BOOST   = 1.6;     // aumenta si quieres aún más detalle
+    const BASE_MAX_W   = 2200;    // tope de ancho por página (render)
+    const JPEG_QUALITY = 0.9;     // calidad JPEG (0.85–0.92 es buen rango)
 
     function isPortrait(){ return innerHeight >= innerWidth; }
-    function renderWidthBase(){ const css = isPortrait()? innerWidth : Math.floor(innerWidth/2); return Math.min(Math.round(css*BASE_BOOST*DPR), BASE_MAX_W); }
-    function renderWidthZoom(){ const css = Math.max(innerWidth, innerHeight)*1.6; return Math.min(Math.round(css*DPR), ZOOM_MAX_W); }
+    function renderWidthBase(){
+      const cssOne = isPortrait()? innerWidth : Math.floor(innerWidth/2);
+      const px     = Math.round(cssOne * BASE_BOOST * DPR);
+      return Math.min(px, BASE_MAX_W);
+    }
 
     let PDF_DOC=null, IMG_URLS=[], pf=null, currentIndex=0;
 
     async function renderPdfToImages(url){
       PDF_DOC = await pdfjsLib.getDocument(url).promise;
-      const count = PDF_DOC.numPages; const urls = [];
+      const count = PDF_DOC.numPages;
+      const urls  = [];
       for(let i=1;i<=count;i++){
         const page = await PDF_DOC.getPage(i);
-        const v1 = page.getViewport({scale:1});
-        const scale = renderWidthBase()/v1.width;
-        const v = page.getViewport({scale});
-        const cv = document.createElement('canvas'); cv.width=Math.floor(v.width); cv.height=Math.floor(v.height);
-        const ctx = cv.getContext('2d',{alpha:false,desynchronized:true});
-        await page.render({canvasContext:ctx, viewport:v}).promise;
-        const blob = await new Promise(r=>cv.toBlob(r,'image/jpeg',0.82)); urls.push(URL.createObjectURL(blob));
+        const v1   = page.getViewport({ scale: 1 });
+        const scl  = renderWidthBase() / v1.width;
+        const v    = page.getViewport({ scale: scl });
+        const cv   = document.createElement('canvas');
+        cv.width   = Math.floor(v.width);
+        cv.height  = Math.floor(v.height);
+        const ctx  = cv.getContext('2d', { alpha:false, desynchronized:true });
+        await page.render({ canvasContext: ctx, viewport: v }).promise;
+        const blob = await new Promise(res => cv.toBlob(res, 'image/jpeg', JPEG_QUALITY));
+        urls.push(URL.createObjectURL(blob));
+
         const bar=document.getElementById('ovbar'), msg=document.getElementById('ovmsg');
-        if(bar) bar.style.width = Math.round((i/count)*100)+'%'; if(msg) msg.textContent = `Renderizando páginas… ${i}/${count}`;
+        if(bar) bar.style.width = Math.round((i/count)*100)+'%';
+        if(msg) msg.textContent = `Preparando páginas en alta… ${i}/${count}`;
       }
       return urls;
-    }
-
-    async function renderPageHiRes(index0){
-      const page = await PDF_DOC.getPage(index0+1);
-      const v1 = page.getViewport({scale:1});
-      const scale = renderWidthZoom()/v1.width; const v = page.getViewport({scale});
-      const cv = document.createElement('canvas'); cv.width=Math.floor(v.width); cv.height=Math.floor(v.height);
-      const ctx = cv.getContext('2d',{alpha:false,desynchronized:true});
-      await page.render({canvasContext:ctx, viewport:v}).promise;
-      return new Promise(r=>cv.toBlob(b=>r(URL.createObjectURL(b)),'image/jpeg',0.92));
     }
 
     function createFlip(images){
       IMG_URLS = images.slice();
       const useP=isPortrait(); const w=useP? innerWidth: Math.floor(innerWidth/2); const h=innerHeight;
-      pf = new St.PageFlip(document.getElementById('book'), {size:'fixed', width:w, height:h, showCover:true, usePortrait:useP, mobileScrollSupport:true, flippingTime:900, drawShadow:true, maxShadowOpacity:0.18});
-      pf.loadFromImages(IMG_URLS);
-      try{ pf.on('flip', e=>{ currentIndex = e.data; }); }catch(_){ }
-      setTimeout(()=>{ try{pf.update();}catch(_){} },240);
-      let t; addEventListener('resize',()=>{ clearTimeout(t); t=setTimeout(()=>{ const p=isPortrait(); try{ pf.update({width: p?innerWidth:Math.floor(innerWidth/2), height: innerHeight}); }catch(_){} },120); },{passive:true});
 
-      // ===== Índice flotante =====
+      pf = new St.PageFlip(document.getElementById('book'), {
+        size:'fixed', width:w, height:h, showCover:true, usePortrait:useP,
+        mobileScrollSupport:true, flippingTime:900, drawShadow:true, maxShadowOpacity:0.18
+      });
+      pf.loadFromImages(IMG_URLS);
+
+      try{ pf.on('flip', e=>{ currentIndex = e.data; }); }catch(_){}
+      setTimeout(()=>{ try{pf.update();}catch(_){} }, 240);
+
+      let t; addEventListener('resize', ()=>{ clearTimeout(t); t=setTimeout(()=>{
+        const p=isPortrait(); try{ pf.update({width: p? innerWidth: Math.floor(innerWidth/2), height: innerHeight}); }catch(_){}
+      },120); }, {passive:true});
+
+      // Índice
       const btnIndex=document.getElementById('btnIndex'); const panel=document.getElementById('panel'); const list=document.getElementById('panelList');
-      btnIndex.addEventListener('click',()=> panel.classList.toggle('open'));
+      btnIndex.addEventListener('click', ()=> panel.classList.toggle('open'));
       list.innerHTML='';
-      for(const [label,page1] of Object.entries(INDEX_MAP)){
+      for(const [label, page1] of Object.entries(INDEX_MAP)){
         const li=document.createElement('li'); const b=document.createElement('button'); b.className='link';
         b.textContent = `${label} · p.${page1}`;
-        b.addEventListener('click',()=>{ panel.classList.remove('open'); try{ pf.turnToPage(page1-1); }catch(_){} });
+        b.addEventListener('click', ()=>{ panel.classList.remove('open'); try{ pf.turnToPage(page1-1); }catch(_){ } });
         li.appendChild(b); list.appendChild(li);
       }
 
-      // ===== Botón Home (Índice) =====
-      const btnHome=document.getElementById('btnHome');
-      btnHome.addEventListener('click',()=>{ try{ pf.turnToPage(INDEX_PAGE-1); }catch(_){} });
-
-      // ===== ZOOM =====
+      // Zoom 3/4 (usa la misma imagen renderizada en alta)
       const zoom=document.getElementById('zoom'); const zimg=document.getElementById('zoomImg'); const zclose=document.getElementById('zoomClose');
       function centerTap(ev){ const edge=80; const x=ev.clientX||(ev.touches&&ev.touches[0]?.clientX)||innerWidth/2; if(x<edge||x>innerWidth-edge) return; openZoom(); }
-      document.getElementById('book').addEventListener('click',centerTap,true);
-      document.getElementById('book').addEventListener('touchend',centerTap,true);
-      async function openZoom(){ const idx=Math.max(0,Math.min(currentIndex,IMG_URLS.length-1)); zimg.src=''; zoom.classList.add('open'); const hi=await renderPageHiRes(idx); zimg.src=hi||IMG_URLS[idx]; }
+      document.getElementById('book').addEventListener('click', centerTap, true);
+      document.getElementById('book').addEventListener('touchend', centerTap, true);
+      function openZoom(){ const idx=Math.max(0,Math.min(currentIndex,IMG_URLS.length-1)); zimg.src=IMG_URLS[idx]; zoom.classList.add('open'); }
       function closeZoom(){ zoom.classList.remove('open'); }
-      zclose.addEventListener('click',closeZoom); zoom.addEventListener('click',e=>{ if(e.target===zoom) closeZoom(); }); window.addEventListener('keydown',e=>{ if(e.key==='Escape' && zoom.classList.contains('open')) closeZoom(); },true);
+      zclose.addEventListener('click', closeZoom); zoom.addEventListener('click', e=>{ if(e.target===zoom) closeZoom(); });
+      window.addEventListener('keydown', e=>{ if(e.key==='Escape'&&zoom.classList.contains('open')) closeZoom(); }, true);
     }
 
     (async()=>{
-      try{ const imgs=await renderPdfToImages(PDF_URL); createFlip(imgs); document.getElementById('ov')?.remove(); }
+      try{ const imgs = await renderPdfToImages(PDF_URL); createFlip(imgs); document.getElementById('ov')?.remove(); }
       catch(e){ console.error(e); const m=document.getElementById('ovmsg'); if(m) m.textContent='No se pudo cargar catalogo.pdf'; }
     })();
   </script>
