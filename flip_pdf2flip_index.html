@@ -17,22 +17,27 @@
 
     /* FAB Índice */
     .fab{position:fixed; right:14px; bottom:16px; z-index:50}
-    .fab button{width:48px;height:48px;border-radius:50%;border:0;background:#1F4E79;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+    .fab button{width:54px;height:54px;border-radius:50%;border:0;background:#1F4E79;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.35); font-size:18px}
 
-    /* Panel del índice con FONDO */
-    .panel{position:fixed; right:14px; bottom:76px; width:min(92vw, 380px); max-height:72vh; overflow:auto; border:1px solid #e7e9ef; border-radius:12px; box-shadow:0 14px 60px rgba(0,0,0,.3); display:none; z-index:60; background:transparent}
+    /* Panel del índice con FONDO (más grande + scroll interno) */
+    .panel{
+      position:fixed; right:10px; bottom:76px;
+      width:min(96vw, 560px); max-height:86vh; 
+      border:1px solid #e7e9ef; border-radius:14px; box-shadow:0 18px 70px rgba(0,0,0,.35);
+      display:none; z-index:60; background:transparent; overflow:hidden
+    }
     .panel.open{display:block}
-    .panel .bg{position:absolute; inset:0; background:#a00 center/cover no-repeat; filter:brightness(.75) saturate(.95); opacity:.98}
-    .panel .inner{position:relative; z-index:1}
-    .panel h3{margin:10px 12px 8px 12px; font:800 16px/1 system-ui; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.35)}
-    .panel ul{list-style:none; padding:0 10px 12px 10px; margin:0; display:grid; gap:6px}
-    .panel li{border:1px solid rgba(255,255,255,.3); border-radius:10px; backdrop-filter: blur(2px); overflow:hidden}
-    .panel button.link{width:100%; text-align:left; padding:10px 12px; background:rgba(255,255,255,.88); border:0; border-radius:10px; cursor:pointer; font:800 14px/1.1 system-ui; color:#222}
+    .panel .bg{position:absolute; inset:0; background:#741 center/cover no-repeat; filter:brightness(.75) saturate(.95); opacity:.98}
+    .panel .inner{position:relative; z-index:1; max-height:86vh; overflow:auto}
+    .panel h3{margin:14px 14px 10px 14px; font:900 18px/1 system-ui; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.35)}
+    .panel ul{list-style:none; padding:0 12px 16px 12px; margin:0; display:grid; gap:8px}
+    .panel li{border:1px solid rgba(255,255,255,.35); border-radius:12px; backdrop-filter: blur(2px); overflow:hidden}
+    .panel button.link{width:100%; text-align:left; padding:12px 14px; background:rgba(255,255,255,.9); border:0; border-radius:12px; cursor:pointer; font:800 15px/1.1 system-ui; color:#222}
     .panel button.link:hover{background:#fff}
 
     /* Botón VER MÁS (galería) */
     .more{position:fixed; left:14px; bottom:16px; z-index:50}
-    .more button{height:48px; padding:0 14px; border-radius:999px; border:0; background:#fff; color:#1F4E79; font:800 14px system-ui; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.35); border:1px solid #dde3ef}
+    .more button{height:48px; padding:0 16px; border-radius:999px; border:0; background:#fff; color:#1F4E79; font:800 14px system-ui; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.35); border:1px solid #dde3ef}
     .more button[disabled]{opacity:.55; cursor:not-allowed}
 
     /* Galería por categoría */
@@ -46,6 +51,7 @@
     @media(min-width:740px){ .gal-grid{ grid-template-columns:repeat(3,1fr) } }
     @media(min-width:980px){ .gal-grid{ grid-template-columns:repeat(4,1fr) } }
     .gal-grid img{ width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; background:#f6f8fb }
+    .gal-empty{font:600 14px system-ui; color:#333; padding:8px}
   </style>
 </head>
 <body>
@@ -77,6 +83,7 @@
         <button class="gal-close" id="galClose" aria-label="Cerrar">×</button>
       </div>
       <div class="gal-grid" id="galGrid"></div>
+      <div class="gal-empty" id="galEmpty" style="display:none">No hay imágenes para esta categoría.</div>
     </div>
   </div>
 
@@ -138,7 +145,7 @@
       setTimeout(()=>{ try{pf.update(); updateMoreState();}catch(_){} }, 240);
       let t; addEventListener('resize', ()=>{ clearTimeout(t); t=setTimeout(()=>{ const p=isPortrait(); try{ pf.update({ width: p? innerWidth: Math.floor(innerWidth/2), height: innerHeight }); }catch(_){} },120); }, {passive:true});
 
-      // Índice con fondo
+      // Índice con fondo (más grande + scroll)
       const btnIndex=document.getElementById('btnIndex'); const panel=document.getElementById('panel'); const list=document.getElementById('panelList'); const panelBg=document.getElementById('panelBg');
       btnIndex.addEventListener('click', ()=> panel.classList.toggle('open'));
       if(MANIFEST?.indexImage){ panelBg.style.backgroundImage = `url('${toAbs(MANIFEST.indexImage)}')`; }
@@ -149,13 +156,41 @@
         li.appendChild(b); list.appendChild(li);
       }
 
-      // VER MÁS → galería de la categoría actual
-      const btnMore=document.getElementById('btnMore'); const gallery=document.getElementById('gallery'); const galTitle=document.getElementById('galTitle'); const galGrid=document.getElementById('galGrid'); const galClose=document.getElementById('galClose');
-      btnMore.addEventListener('click', ()=>{ const p1=(currentIndex+1).toString(); const cat=(MANIFEST.pageToCategory||{})[p1]; if(!cat) return; const imgs=(MANIFEST.categories||{})[cat]||[]; if(!imgs.length) return; galTitle.textContent=cat; galGrid.innerHTML=''; imgs.forEach(src=>{ const img=document.createElement('img'); img.loading='lazy'; img.src=toAbs(src); galGrid.appendChild(img); }); gallery.classList.add('open'); });
+      // VER MÁS → galería de la categoría actual (con fallback de extensión)
+      const btnMore=document.getElementById('btnMore'); const gallery=document.getElementById('gallery'); const galTitle=document.getElementById('galTitle'); const galGrid=document.getElementById('galGrid'); const galClose=document.getElementById('galClose'); const galEmpty=document.getElementById('galEmpty');
+
+      btnMore.addEventListener('click', ()=>{
+        const p1=(currentIndex+1).toString(); const cat=(MANIFEST.pageToCategory||{})[p1]; if(!cat) return;
+        const imgs=(MANIFEST.categories||{})[cat]||[]; galTitle.textContent=cat; galGrid.innerHTML=''; let loaded=0;
+        imgs.forEach(src=>{ const el = makeImgWithFallback(src); el.loading='lazy'; el.addEventListener('load', ()=>{loaded++;}); galGrid.appendChild(el); });
+        galEmpty.style.display = imgs.length? 'none':'block';
+        gallery.classList.add('open');
+      });
+
       function updateMoreState(){ const p1=(currentIndex+1).toString(); const cat=(MANIFEST.pageToCategory||{})[p1]; btnMore.disabled = !cat || !(MANIFEST.categories||{})[cat]?.length; }
       galClose.addEventListener('click', ()=> gallery.classList.remove('open'));
       gallery.addEventListener('click', e=>{ if(e.target===gallery) gallery.classList.remove('open'); });
       window.addEventListener('keydown', e=>{ if(e.key==='Escape' && gallery.classList.contains('open')) gallery.classList.remove('open'); }, true);
+    }
+
+    function makeImgWithFallback(src){
+      const img = new Image();
+      const variants = buildVariants(src);
+      let i=0;
+      function tryNext(){ img.src = toAbs(variants[i++]); }
+      img.onerror = ()=>{ if(i < variants.length) tryNext(); };
+      tryNext();
+      return img;
+    }
+
+    function buildVariants(src){
+      const out=[src];
+      const m = src.match(/^(.*)\.(jpg|jpeg|png|webp)$/i);
+      if(m){
+        const base=m[1];
+        ['jpg','jpeg','JPG','JPEG','png','PNG','webp','WebP','WEBP'].forEach(ext=> out.push(base+'.'+ext));
+      }
+      return [...new Set(out)];
     }
 
     (async()=>{
