@@ -42,9 +42,9 @@
   <div class="panel" id="panel"><h3>Índice</h3><ul id="panelList"></ul></div>
 
   <!-- StPageFlip -->
-  https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js</script>
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
   <!-- PDF.js -->
-  https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js</script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script>
     // ===== Configuración =====
     const PDF_URL    = 'catalogo.pdf';  // coloca tu PDF con este nombre o cambia la ruta
@@ -74,7 +74,7 @@
       'Ubicación':        23
     };
 
-    // === PDF.js worker ===
+    // PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
     // ===== Alta calidad desde el inicio (ajustable) =====
@@ -130,12 +130,12 @@
       });
       pf.loadFromImages(IMG_URLS);
 
-      try{ pf.on('flip', e=>{ currentIndex = e.data; }); }catch(_){}
-      setTimeout(()=>{ try{pf.update();}catch(_){} }, 240);
+      try{ pf.on('flip', e=>{ currentIndex = e.data; }); }catch(_){ }
+      setTimeout(()=>{ try{pf.update();}catch(_){ } }, 240);
 
       // Ajuste al cambiar orientación/tamaño
       let t; addEventListener('resize', ()=>{ clearTimeout(t); t=setTimeout(()=>{
-        const p=isPortrait(); try{ pf.update({width: p? innerWidth: Math.floor(innerWidth/2), height: innerHeight}); }catch(_){}
+        const p=isPortrait(); try{ pf.update({width: p? innerWidth: Math.floor(innerWidth/2), height: innerHeight}); }catch(_){ }
       },120); }, {passive:true});
 
       // Índice flotante
