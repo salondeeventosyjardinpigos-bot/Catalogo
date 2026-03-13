@@ -1,0 +1,25 @@
+{
+  "indexImage": "assets/indice_bg.jpg",
+  "categories": {
+    "Mantelería": [
+      "images/Manteleria/manteleria01.jpg",
+      "images/Manteleria/manteleria02.jpg",
+      "images/Manteleria/manteleria03.jpg"
+    ],
+    "Pasto sintético": [
+      "images/PastoSintetico/pasto1.jpg",
+      "images/PastoSintetico/pasto2.jpg",
+      "images/PastoSintetico/pasto3.jpg"
+    ],
+    "Carpas": [
+      "images/Carpas/carpas01.jpg",
+      "images/Carpas/carpas02.jpg",
+      "images/Carpas/carpas03.jpg"
+    ]
+  },
+  "pageToCategory": {
+    "3": "Mantelería",
+    "4": "Pasto sintético",
+    "5": "Carpas"
+  }
+}

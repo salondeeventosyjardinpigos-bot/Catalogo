@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Catálogo – Flip PDF (alta) + Índice</title>
+  <title>Catálogo – Flip PDF (alta) + Índice con imagen + Galería</title>
   <style>
     html,body{margin:0;height:100%;background:#fff;overscroll-behavior:none}
     #book{width:100vw;height:100vh;background:#fff}
@@ -20,13 +20,26 @@
     .fab button{width:48px;height:48px;border-radius:50%;border:0;background:#1F4E79;color:#fff;font-weight:800;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.35)}
 
     /* Panel del índice */
-    .panel{position:fixed; right:14px; bottom:76px; width:min(90vw, 360px); max-height:70vh; overflow:auto; background:#fff; border:1px solid #e7e9ef; border-radius:12px; box-shadow:0 14px 60px rgba(0,0,0,.3); display:none; z-index:60}
+    .panel{position:fixed; right:14px; bottom:76px; width:min(92vw, 380px); max-height:72vh; overflow:auto; background:#fff; border:1px solid #e7e9ef; border-radius:12px; box-shadow:0 14px 60px rgba(0,0,0,.3); display:none; z-index:60}
     .panel.open{display:block}
-    .panel h3{margin:12px 12px 8px 12px; font:700 16px/1 system-ui; color:#1F4E79}
-    .panel ul{list-style:none; padding:0 10px 10px 10px; margin:0; display:grid; gap:6px}
+    .panel .cover{ display:block; width:100%; height:140px; object-fit:cover; border-radius:12px 12px 0 0; background:#f2f3f7 }
+    .panel h3{margin:10px 12px 8px 12px; font:800 16px/1 system-ui; color:#1F4E79}
+    .panel ul{list-style:none; padding:0 10px 12px 10px; margin:0; display:grid; gap:6px}
     .panel li{border:1px solid #e9ecf3; border-radius:10px}
-    .panel button.link{width:100%; text-align:left; padding:10px 12px; background:#fff; border:0; border-radius:10px; cursor:pointer; font:600 14px/1.1 system-ui; color:#223}
+    .panel button.link{width:100%; text-align:left; padding:10px 12px; background:#fff; border:0; border-radius:10px; cursor:pointer; font:700 14px/1.1 system-ui; color:#223}
     .panel button.link:hover{background:#f6f8fb}
+
+    /* Galería por categoría */
+    .gallery{ position:fixed; inset:0; background:rgba(0,0,0,.8); display:none; z-index:70; align-items:center; justify-content:center; padding:18px; overflow:auto }
+    .gallery.open{ display:flex }
+    .gal-wrap{ width:min(1100px, 96vw); background:#fff; border-radius:12px; box-shadow:0 18px 80px rgba(0,0,0,.55); padding:14px }
+    .gal-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px }
+    .gal-head h4{ margin:0; font:800 16px/1 system-ui; color:#1F4E79 }
+    .gal-close{ width:40px;height:40px;border-radius:50%;border:0;background:#1F4E79;color:#fff;font-size:20px;cursor:pointer }
+    .gal-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px }
+    @media(min-width:740px){ .gal-grid{ grid-template-columns:repeat(3,1fr) } }
+    @media(min-width:980px){ .gal-grid{ grid-template-columns:repeat(4,1fr) } }
+    .gal-grid img{ width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:8px; background:#f6f8fb }
   </style>
 </head>
 <body>
@@ -34,85 +47,75 @@
   <div class="overlay" id="ov">
     <div class="msg" id="ovmsg">Preparando páginas en alta…</div>
     <div class="bar"><i id="ovbar"></i></div>
-    <div class="hint">portrait=1 página · landscape=2 páginas</div>
+    <div class="hint">portrait=1 · landscape=2 — Toca el centro para ver la galería de la categoría</div>
   </div>
 
   <!-- Índice -->
   <div class="fab"><button id="btnIndex" title="Índice">☰</button></div>
-  <div class="panel" id="panel"><h3>Índice</h3><ul id="panelList"></ul></div>
+  <div class="panel" id="panel">
+    <img id="panelCover" class="cover" alt="Índice" />
+    <h3>Índice</h3>
+    <ul id="panelList"></ul>
+  </div>
+
+  <!-- Galería -->
+  <div class="gallery" id="gallery">
+    <div class="gal-wrap">
+      <div class="gal-head">
+        <h4 id="galTitle">Categoría</h4>
+        <button class="gal-close" id="galClose" aria-label="Cerrar">×</button>
+      </div>
+      <div class="gal-grid" id="galGrid"></div>
+    </div>
+  </div>
 
   <!-- StPageFlip -->
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
   <!-- PDF.js -->
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script>
-    // ===== Configuración =====
-    const PDF_URL    = 'catalogo.pdf';  // coloca tu PDF con este nombre o cambia la ruta
-    const INDEX_PAGE = 2;               // página (1-based) del índice dentro del PDF
+    const PDF_URL      = 'catalogo.pdf';
+    const MANIFEST_URL = 'images/manifest.gallery.json';
 
-    // Mapa Categoría -> Página (1-based). Ajusta si tu export cambia el orden.
-    const INDEX_MAP = {
-      'Mantelería':       3,
-      'Pasto sintético':  4,
-      'Carpas':           5,
-      'Charcutería':      6,
-      'Desayunos':        8,
-      'Mobiliario':       9,
-      'Tapes':            10,
-      'Café':             11,
-      'Jardín':           12,
-      'Salón':            13,
-      'Mesa de dulces':   14,
-      'Salas':            15,
-      'Platos base':      16,
-      'Copas':            17,
-      'Pista LED':        18,
-      'Inflables':        19,
-      'Sillones':         20,
-      'Mesa de novios':   21,
-      'Letras':           22,
-      'Ubicación':        23
-    };
+    // Alta calidad desde el inicio
+    const DPR = Math.min(2, window.devicePixelRatio || 1);
+    const BASE_BOOST = 1.7;     // 1.4–1.8
+    const BASE_MAX_W = 2300;    // 2000–2400
+    const JPEG_QUALITY = 0.9;   // 0.88–0.92
 
-    // PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
-    // ===== Alta calidad desde el inicio (ajustable) =====
-    const DPR          = Math.min(2, window.devicePixelRatio || 1);
-    const BASE_BOOST   = 1.6;     // mayor valor = más detalle (y más peso)
-    const BASE_MAX_W   = 2200;    // tope de ancho renderizado por página
-    const JPEG_QUALITY = 0.9;     // 0.85–0.92 recomendado
-
     function isPortrait(){ return innerHeight >= innerWidth; }
+    function baseDir(){ return location.pathname.split('/').filter(Boolean)[0]||''; }
+    function toAbs(p){ return p.startsWith('/')? p : ('/'+baseDir()+'/'+p); }
     function renderWidthBase(){
       const cssOne = isPortrait()? innerWidth : Math.floor(innerWidth/2);
-      const px     = Math.round(cssOne * BASE_BOOST * DPR);
+      const px = Math.round(cssOne * BASE_BOOST * DPR);
       return Math.min(px, BASE_MAX_W);
     }
 
-    let PDF_DOC=null, IMG_URLS=[], pf=null, currentIndex=0;
+    let PDF_DOC=null, IMG_URLS=[], pf=null, currentIndex=0, MANIFEST=null;
 
-    // Renderiza TODO el PDF a imágenes en alta (sin zoom ni re-render posterior)
+    async function loadManifest(){
+      const r = await fetch(toAbs(MANIFEST_URL), { cache:'no-store' });
+      if(!r.ok) throw new Error('No se pudo cargar manifest.gallery.json');
+      return await r.json();
+    }
+
     async function renderPdfToImages(url){
-      PDF_DOC = await pdfjsLib.getDocument(url).promise;
-      const count = PDF_DOC.numPages;
-      const urls  = [];
+      PDF_DOC = await pdfjsLib.getDocument(toAbs(url)).promise;
+      const count = PDF_DOC.numPages; const urls = [];
       for(let i=1;i<=count;i++){
         const page = await PDF_DOC.getPage(i);
-        const v1   = page.getViewport({ scale: 1 });
-        const scl  = renderWidthBase() / v1.width;
-        const v    = page.getViewport({ scale: scl });
-
-        const cv   = document.createElement('canvas');
-        cv.width   = Math.floor(v.width);
-        cv.height  = Math.floor(v.height);
-        const ctx  = cv.getContext('2d', { alpha:false, desynchronized:true });
+        const v1 = page.getViewport({ scale: 1 });
+        const scl = renderWidthBase() / v1.width;
+        const v = page.getViewport({ scale: scl });
+        const cv = document.createElement('canvas');
+        cv.width = Math.floor(v.width); cv.height = Math.floor(v.height);
+        const ctx = cv.getContext('2d', { alpha:false, desynchronized:true });
         await page.render({ canvasContext: ctx, viewport: v }).promise;
-
         const blob = await new Promise(res => cv.toBlob(res, 'image/jpeg', JPEG_QUALITY));
         urls.push(URL.createObjectURL(blob));
-
-        // progreso
         const bar=document.getElementById('ovbar'), msg=document.getElementById('ovmsg');
         if(bar) bar.style.width = Math.round((i/count)*100)+'%';
         if(msg) msg.textContent = `Preparando páginas en alta… ${i}/${count}`;
@@ -123,36 +126,40 @@
     function createFlip(images){
       IMG_URLS = images.slice();
       const useP=isPortrait(); const w=useP? innerWidth: Math.floor(innerWidth/2); const h=innerHeight;
-
-      pf = new St.PageFlip(document.getElementById('book'), {
-        size:'fixed', width:w, height:h, showCover:true, usePortrait:useP,
-        mobileScrollSupport:true, flippingTime:900, drawShadow:true, maxShadowOpacity:0.18
-      });
+      pf = new St.PageFlip(document.getElementById('book'), { size:'fixed', width:w, height:h, showCover:true, usePortrait:useP, mobileScrollSupport:true, flippingTime:900, drawShadow:true, maxShadowOpacity:0.18 });
       pf.loadFromImages(IMG_URLS);
-
       try{ pf.on('flip', e=>{ currentIndex = e.data; }); }catch(_){ }
-      setTimeout(()=>{ try{pf.update();}catch(_){ } }, 240);
+      setTimeout(()=>{ try{pf.update();}catch(_){} }, 240);
+      let t; addEventListener('resize', ()=>{ clearTimeout(t); t=setTimeout(()=>{ const p=isPortrait(); try{ pf.update({ width: p? innerWidth: Math.floor(innerWidth/2), height: innerHeight }); }catch(_){} },120); }, {passive:true});
 
-      // Ajuste al cambiar orientación/tamaño
-      let t; addEventListener('resize', ()=>{ clearTimeout(t); t=setTimeout(()=>{
-        const p=isPortrait(); try{ pf.update({width: p? innerWidth: Math.floor(innerWidth/2), height: innerHeight}); }catch(_){ }
-      },120); }, {passive:true});
-
-      // Índice flotante
-      const btnIndex=document.getElementById('btnIndex'); const panel=document.getElementById('panel'); const list=document.getElementById('panelList');
+      // Índice con imagen
+      const btnIndex=document.getElementById('btnIndex'); const panel=document.getElementById('panel'); const list=document.getElementById('panelList'); const panelCover=document.getElementById('panelCover');
       btnIndex.addEventListener('click', ()=> panel.classList.toggle('open'));
+      if(MANIFEST?.indexImage){ panelCover.src = toAbs(MANIFEST.indexImage); } else panelCover.style.display='none';
       list.innerHTML='';
-      for(const [label, page1] of Object.entries(INDEX_MAP)){
-        const li=document.createElement('li'); const b=document.createElement('button'); b.className='link';
-        b.textContent = `${label} · p.${page1}`;
-        b.addEventListener('click', ()=>{ panel.classList.remove('open'); try{ pf.turnToPage(page1-1); }catch(_){ } });
+      for(const name of Object.keys(MANIFEST.categories||{})){
+        const li=document.createElement('li'); const b=document.createElement('button'); b.className='link'; b.textContent = name;
+        b.addEventListener('click', ()=>{ panel.classList.remove('open');
+          const pStr = Object.entries(MANIFEST.pageToCategory||{}).find(([pg,cat])=>cat===name)?.[0];
+          if(pStr){ try{ pf.turnToPage(parseInt(pStr,10)-1); }catch(_){} }
+        });
         li.appendChild(b); list.appendChild(li);
       }
+
+      // Tap central → galería de la categoría actual
+      const gallery=document.getElementById('gallery'); const galTitle=document.getElementById('galTitle'); const galGrid=document.getElementById('galGrid'); const galClose=document.getElementById('galClose');
+      function centerTap(ev){ const edge=80; const x=ev.clientX||(ev.touches&&ev.touches[0]?.clientX)||innerWidth/2; if(x<edge||x>innerWidth-edge) return; openGalleryForCurrentPage(); }
+      document.getElementById('book').addEventListener('click', centerTap, true);
+      document.getElementById('book').addEventListener('touchend', centerTap, true);
+      function openGalleryForCurrentPage(){ const p1=(currentIndex+1).toString(); const cat=(MANIFEST.pageToCategory||{})[p1]; if(!cat) return; const imgs=(MANIFEST.categories||{})[cat]||[]; if(!imgs.length) return; galTitle.textContent=cat; galGrid.innerHTML=''; imgs.forEach(src=>{ const img=document.createElement('img'); img.loading='lazy'; img.src=toAbs(src); galGrid.appendChild(img); }); gallery.classList.add('open'); }
+      galClose.addEventListener('click', ()=> gallery.classList.remove('open'));
+      gallery.addEventListener('click', e=>{ if(e.target===gallery) gallery.classList.remove('open'); });
+      window.addEventListener('keydown', e=>{ if(e.key==='Escape' && gallery.classList.contains('open')) gallery.classList.remove('open'); }, true);
     }
 
     (async()=>{
-      try{ const imgs = await renderPdfToImages(PDF_URL); createFlip(imgs); document.getElementById('ov')?.remove(); }
-      catch(e){ console.error(e); const m=document.getElementById('ovmsg'); if(m) m.textContent='No se pudo cargar catalogo.pdf'; }
+      try{ MANIFEST = await loadManifest(); const imgs = await renderPdfToImages(PDF_URL); createFlip(imgs); document.getElementById('ov')?.remove(); }
+      catch(e){ console.error(e); const m=document.getElementById('ovmsg'); if(m) m.textContent='No se pudo cargar catálogo o manifest'; }
     })();
   </script>
 </body>
